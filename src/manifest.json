@@ -3,6 +3,20 @@
   "name": "YouTube Time Loop",
   "version": "0.2",
   "background": {
-    "page": "./background.html"
-  }
+    "page": "background.html"
+  },
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "popup.js",
+    "util/logger.js",
+    "content_main.js"
+  ]
 }
