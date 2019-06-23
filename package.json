@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' src/ dist/"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.4.5"
