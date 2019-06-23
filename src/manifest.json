@@ -18,6 +18,7 @@
   "web_accessible_resources": [
     "popup.js",
     "util/logger.js",
-    "content_main.js"
+    "content_main.js",
+    "YouTubeTimeLoop.js"
   ]
 }
