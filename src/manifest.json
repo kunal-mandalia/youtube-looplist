@@ -5,7 +5,7 @@
   "background": {
     "page": "background.html"
   },
-  "browser_action": {
+  "page_action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
@@ -14,6 +14,7 @@
       "js": ["content_script.js"]
     }
   ],
+  "permissions": ["declarativeContent"],
   "web_accessible_resources": [
     "popup.js",
     "util/logger.js",

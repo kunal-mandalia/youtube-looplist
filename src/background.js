@@ -9,20 +9,44 @@ function getSenderId(sender) {
   return sender.id
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  logger.info(`background.js received message`, message, sender)
-
-  if (!message || !message.type) {
-    logger.error(`unahndled message type`, message)
-  }
-
-  if (message.type === 'PING') {
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      logger.info(`tabs`, tabs)
-      chrome.tabs.sendMessage(tabs[0].id, { type: "PING_CONTENT" }, (response) => {
-        logger.info(`response from content to ping`, response)
-      })
+function conditionallyEnableExtension(conditions = {}) {
+  chrome.runtime.onInstalled.addListener(() => {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+      chrome.declarativeContent.onPageChanged.addRules([{
+        conditions: [new chrome.declarativeContent.PageStateMatcher({
+          pageUrl: {hostEquals: conditions.hostEquals},
+        })
+        ],
+            actions: [new chrome.declarativeContent.ShowPageAction()]
+      }])
+      logger.info(`added rule to whitelist host`)
     })
-    return sendResponse({ type: 'PING', data: 'pong' })
-  }
-})
+  })
+}
+
+function setupMessageListener() {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    logger.info(`background.js received message`, message, sender)
+  
+    if (!message || !message.type) {
+      logger.error(`unahndled message type`, message)
+    }
+  
+    if (message.type === 'PING') {
+      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        logger.info(`tabs`, tabs)
+        chrome.tabs.sendMessage(tabs[0].id, { type: "PING_CONTENT" }, (response) => {
+          logger.info(`response from content to ping`, response)
+        })
+      })
+      return sendResponse({ type: 'PING', data: 'pong' })
+    }
+  })
+}
+
+function main() {
+  conditionallyEnableExtension({ hostEquals: 'localhost' })
+  setupMessageListener()
+}
+
+main()
