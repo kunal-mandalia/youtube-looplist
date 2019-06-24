@@ -1,5 +1,5 @@
 (async () => {
   const src = chrome.extension.getURL("content_main.js")
-  const contentMain = await import(src)
-  contentMain.main()
+  const content = await import(src)
+  content.main()
 })()

@@ -2,14 +2,7 @@ import { logger } from './util/logger.js'
 
 logger.info(`background.js is running`)
 
-function getSenderId(sender) {
-  if (sender.tab) {
-    return sender.tab.id
-  }
-  return sender.id
-}
-
-function conditionallyEnableExtension(conditions = {}) {
+function enableExtension(conditions = {}) {
   chrome.runtime.onInstalled.addListener(() => {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
       chrome.declarativeContent.onPageChanged.addRules([{
@@ -32,21 +25,23 @@ function setupMessageListener() {
       logger.error(`unahndled message type`, message)
     }
   
-    if (message.type === 'PING') {
+    if (message.type === 'START_LOOP') {
       chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         logger.info(`tabs`, tabs)
-        chrome.tabs.sendMessage(tabs[0].id, { type: "PING_CONTENT" }, (response) => {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "PLAY_VIDEO", payload: { startTime: "01:20" } }, (response) => {
           logger.info(`response from content to ping`, response)
         })
       })
-      return sendResponse({ type: 'PING', data: 'pong' })
+      return sendResponse({ status: "OK" })
     }
   })
 }
 
 function main() {
-  conditionallyEnableExtension({ hostEquals: 'localhost' })
+  enableExtension({ hostEquals: 'localhost' })
   setupMessageListener()
 }
 
 main()
+
+export default {}
