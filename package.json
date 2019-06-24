@@ -20,7 +20,8 @@
   },
   "jest": {
     "setupFiles": [
-      "./__mocks__/client.js"
+      "./__mocks__/dom.js",
+      "./__mocks__/chrome.js"
     ]
   }
 }

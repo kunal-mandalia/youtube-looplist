@@ -26,20 +26,33 @@ function setupMessageListener() {
     }
   
     if (message.type === 'START_LOOP') {
+      const periodInMinutes = 1
+      chrome.alarms.create('PLAY_VIDEO', { periodInMinutes })
+      return sendResponse({ status: "OK" })
+    }
+  })
+}
+
+function setupAlarmListeners() {
+  chrome.alarms.onAlarm.addListener((alarmInfo = {}) => {
+    logger.info(`alarm went off ${JSON.stringify(alarmInfo)}`)
+    const { name } = alarmInfo
+
+    if (name === 'PLAY_VIDEO') {
       chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         logger.info(`tabs`, tabs)
-        chrome.tabs.sendMessage(tabs[0].id, { type: "PLAY_VIDEO", payload: { startTime: "01:20" } }, (response) => {
-          logger.info(`response from content to ping`, response)
+        chrome.tabs.sendMessage(tabs[0].id, { type: "PLAY_VIDEO", payload: { startTime: "01:10" } }, (response) => {
+          logger.info(`response from content to PLAY_VIDEO`, response)
         })
       })
-      return sendResponse({ status: "OK" })
     }
   })
 }
 
 function main() {
   enableExtension({ hostEquals: 'localhost' })
-  setupMessageListener()
+  setupMessageListener(),
+  setupAlarmListeners()
 }
 
 main()

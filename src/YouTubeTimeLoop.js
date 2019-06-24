@@ -16,7 +16,7 @@ class YouTubeTimeLoop {
   play = startTime => {
     const start = YouTubeTimeLoop.convertToSeconds(startTime)
     this.video.currentTime = start
-    this.video.play()
+    this.video.play(start)
   }
 }
 
