@@ -1,7 +1,7 @@
-import popup from './src/popup.js'
-import content from './src/content_main.js'
-import background from './src/background'
-import { youtubeTimeLoop } from './src/YouTubeTimeLoop'
+import popup from '../src/popup.js'
+import content from '../src/content_main.js'
+import background from '../src/background'
+import { youtubeTimeLoop } from '../src/YouTubeTimeLoop'
 
 const mockVideo = {
   play: jest.fn()
@@ -21,6 +21,7 @@ describe(`app`, () => {
 
     it(`should loop the video between start and end time`, () => {
       // message: START_LOOP with args
+      // -- stub alarm 
       // observe video play count n times
     })
   })
