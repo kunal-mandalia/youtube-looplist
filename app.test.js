@@ -1,32 +1,20 @@
-import { startLoop } from './src/popup.js'
-import {
-  main as contentMain
-} from './src/content_main.js'
+import popup from './src/popup.js'
+import content from './src/content_main.js'
+import background from './src/background'
+import { youtubeTimeLoop } from './src/YouTubeTimeLoop'
 
 const mockVideo = {
   play: jest.fn()
 }
 
-global.document.querySelector = jest.fn().mockImplementation(query => {
-  if (query === 'video') {
-    return mockVideo
-  }
-  return null
-})
-
 beforeAll(() => {
-  contentMain()
+  youtubeTimeLoop.setVideo(mockVideo)
 })
 
-describe.skip(`app`, () => {
+describe(`app`, () => {
   describe(`start loop`, () => {
-    it(`should start playing the video`, () => {
-      // message: START_LOOP with args
-      startLoop("1:10", "1:15")
-      //  -- stub chrome messaging
-      //  -- stub chrome alarm
-      //  -- stub video
-      // observe video.play called
+    it.only(`should start playing the video`, () => {
+      popup.startLoop("1:10", "1:15")
       expect(mockVideo.play).toBeCalled()
     })
 

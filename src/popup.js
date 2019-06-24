@@ -2,7 +2,7 @@ import { logger } from './util/logger.js'
 
 logger.info(`popup.js invoked`)
 
-export function startLoop(startTime, endTime) {
+function startLoop(startTime, endTime) {
   const message = {
     type: 'START_LOOP',
     payload: {
@@ -13,4 +13,8 @@ export function startLoop(startTime, endTime) {
   chrome.runtime.sendMessage(message, response => {
     logger.info(`popup startLoop response`, response)
   })
+}
+
+export default {
+  startLoop
 }
