@@ -1,8 +1,19 @@
 import { logger } from './util/logger.js'
 
-logger.info(`background.js is running`, chrome)
+logger.info(`background.js is running`)
 
-let lastActiveTabId = null
+const _alarms = {}
+
+function convertToSeconds(timeString) {
+  const [m, s] = timeString.split(":")
+  return (parseInt(m, 10) * 60) + (parseInt(s, 10))
+}
+
+function getPeriodInMinutes(startTime, endTime) {
+  const start = convertToSeconds(startTime)
+  const end = convertToSeconds(endTime)
+  return (end - start) / 60
+}
 
 function enableExtension(conditions = {}) {
   chrome.runtime.onInstalled.addListener(() => {
@@ -29,31 +40,31 @@ function setupMessageListener() {
     }
     
     if (message.type === 'START_LOOP') {
-      lastActiveTabId = message.payload.tabId
-      const periodInMinutes = 0.1
-      chrome.alarms.create('PLAY_VIDEO', { when: Date.now(), periodInMinutes })
+      const { startTime, endTime } = message.payload
+      const periodInMinutes = getPeriodInMinutes(startTime, endTime)
+      logger.info(`periodInMinutes`, periodInMinutes)
+
+      const alarmName = 'PLAY_VIDEO'
+      const alarm = { when: Date.now(), periodInMinutes }
+      chrome.alarms.create(alarmName, alarm)
+      _alarms[alarmName] = { name: alarmName, ...alarm, ...message.payload }
+      logger.info(`_alarms`, _alarms)
       return sendResponse({ status: "OK" })
     }
   })
 }
 
 function setupAlarmListeners() {
-  logger.info(`chrome`, chrome)
   chrome.alarms.onAlarm.addListener((alarmInfo = {}) => {
     logger.info(`alarm went off ${JSON.stringify(alarmInfo)}`)
     const { name } = alarmInfo
 
+
     if (name === 'PLAY_VIDEO') {
-      // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      //   logger.info(`tabs`, tabs)
-      //   const tabId = tabs && tabs[0].id || videoLoopTabId
-      //   chrome.tabs.sendMessage(tabId, { type: "PLAY_VIDEO", payload: { startTime: "01:10" } }, (response) => {
-      //     logger.info(`response from content to PLAY_VIDEO`, response)
-      //   })
-      // })
-      chrome.tabs.sendMessage(lastActiveTabId, {
+      const alarm = _alarms[name]
+      chrome.tabs.sendMessage(alarm.tabId, {
         type: "PLAY_VIDEO",
-        payload: { startTime: "01:10" }
+        payload: { startTime: alarm.startTime }
       }, (response) => {
         logger.info(`response from content to PLAY_VIDEO`, response)
       })

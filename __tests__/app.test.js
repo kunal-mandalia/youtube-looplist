@@ -33,7 +33,7 @@ describe(`app`, () => {
         loops: 5
       }
 
-      popup.startLoop(input.startTime, input.endTime)
+      popup.startLoop(1, input.startTime, input.endTime)
       jest.advanceTimersByTime(input.wait)
 
       expect(mockVideo.play).toBeCalledTimes(expected.loops)

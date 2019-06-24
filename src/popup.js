@@ -16,6 +16,12 @@ function startLoop(tabId, startTime, endTime) {
   })
 }
 
+function stopLoops() {
+  chrome.alarms.clearAll(wasCleared => {
+    logger.info(`stop loops ${wasCleared ? 'cleared' : 'not cleared'}`)
+  })
+}
+
 function setupHandlers() {
   const startLoopButton = document.getElementById('button-start-loop')
   startLoopButton.addEventListener('click', () => {
@@ -25,6 +31,11 @@ function setupHandlers() {
       logger.info(`starting loop`, startTime, endTime)
       startLoop(tabs[0].id, startTime, endTime)
     })
+  })
+
+  const stopLoopsButton = document.getElementById('button-stop-loops')
+  stopLoopsButton.addEventListener('click', () => {
+    stopLoops()
   })
 }
 
