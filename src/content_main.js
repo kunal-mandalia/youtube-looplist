@@ -31,7 +31,6 @@ export function assignVideo () {
 
 export function main () {
   logger.info(`content_main main() invoked`)
-  logger.info(`foo ${youtubeTimeLoop.foo()}`)
   
   assignVideo()
   setupMessageListener()
