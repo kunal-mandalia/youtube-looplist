@@ -1,7 +1,6 @@
 import { logger } from './util/logger.js'
 import { youtubeTimeLoop } from './YouTubeTimeLoop.js'
 
-logger.info(`content_main invoked`)
 
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -19,23 +18,19 @@ function setupMessageListener() {
 }
 
 function assignVideo () {
-  logger.info(`DOM`, document.getElementById('video'))
   const video = document.querySelector(`video`)
-
-  logger.info(`assignVideo`, video)
-
   if (video) {
     youtubeTimeLoop.setVideo(video)
   }
 }
 
-function main () {
-  logger.info(`content_main main() invoked`)
+export function main () {
+  logger.info(`content main invoked`)
   
   assignVideo()
   setupMessageListener()
 }
 
-main()
-
-export default {}
+export default {
+  main
+}

@@ -8,6 +8,7 @@ const mockVideo = {
 }
 
 beforeAll(() => {
+  content.main()
   youtubeTimeLoop.setVideo(mockVideo)
 })
 
