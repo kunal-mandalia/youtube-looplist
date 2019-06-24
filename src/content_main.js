@@ -13,6 +13,7 @@ function setupMessageListener() {
     if (message.type === "PLAY_VIDEO") {
       const { startTime } = message.payload
       youtubeTimeLoop.play(startTime)
+      return sendResponse({ status: "OK" })
     }
   })
 }
@@ -25,7 +26,7 @@ function assignVideo () {
 }
 
 export function main () {
-  logger.info(`content main invoked`)
+  logger.info(`content_main.js invoked`)
   
   assignVideo()
   setupMessageListener()

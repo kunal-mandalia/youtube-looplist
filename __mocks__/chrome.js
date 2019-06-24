@@ -1,7 +1,12 @@
+const minToMs = minutes => minutes * 1000 * 60
+
 class MockChrome {
   constructor() {
+    this.alarms = {}
     this.messages = []
-    this.messageHandlers = []
+
+    this.messageListeners = []
+    this.alarmListeners = []
     
     this.declarativeContent = {
       onPageChanged: {
@@ -21,7 +26,10 @@ class MockChrome {
       sendMessage: this._tabSendMessage
     }
     this.alarms = {
-      create: this._alarmCreate
+      create: this._alarmCreate,
+      onAlarm: {
+        addListener: this._addAlarmListener
+      }
     }
   }
 
@@ -31,25 +39,39 @@ class MockChrome {
 
   _sendMessage = (message, callback) => {
     this.messages.push(message)
-    this.messageHandlers.forEach(handler => {
+    this.messageListeners.forEach(handler => {
       handler(message, {}, callback)
     })
   }
 
   _addListener = (fn) => {
-    this.messageHandlers.push(fn)
+    this.messageListeners.push(fn)
   }
 
   _tabSendMessage = (tab, message, callback) => {
     this.messages.push(message)
-    this.messageHandlers.forEach(handler => {
+    this.messageListeners.forEach(handler => {
       handler(message, tab, callback)
     })
   }
 
-  _alarmCreate = () => {}
+  _alarmCreate = (name, alarmInfo = {}) => {
+    const interval = setInterval(() => { this._notifyAlarmListeners({ name, ...alarmInfo }) }, minToMs(alarmInfo.periodInMinutes))
+    this.alarms[name] = {
+      interval,
+      alarmInfo
+    }
+  }
 
-  _onAlarm = () => {}
+  _addAlarmListener = (callback) => {
+    this.alarmListeners.push(callback)
+  }
+
+  _notifyAlarmListeners = (alarmInfo) => {
+    this.alarmListeners.forEach(listener => {
+      listener(alarmInfo)
+    })
+  }
 }
 
 const mockChrome = new MockChrome()
