@@ -14,7 +14,10 @@
       "js": ["content_script.js"]
     }
   ],
-  "permissions": ["declarativeContent"],
+  "permissions": [
+    "declarativeContent",
+    "alarms"
+  ],
   "web_accessible_resources": [
     "popup.js",
     "util/logger.js",

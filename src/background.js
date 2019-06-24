@@ -1,6 +1,8 @@
 import { logger } from './util/logger.js'
 
-logger.info(`background.js is running`)
+logger.info(`background.js is running`, chrome)
+
+let lastActiveTabId = null
 
 function enableExtension(conditions = {}) {
   chrome.runtime.onInstalled.addListener(() => {
@@ -20,37 +22,47 @@ function enableExtension(conditions = {}) {
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     logger.info(`background.js received message`, message, sender)
-  
+
+    
     if (!message || !message.type) {
       logger.error(`unahndled message type`, message)
     }
-  
+    
     if (message.type === 'START_LOOP') {
-      const periodInMinutes = 1
-      chrome.alarms.create('PLAY_VIDEO', { periodInMinutes })
+      lastActiveTabId = message.payload.tabId
+      const periodInMinutes = 0.1
+      chrome.alarms.create('PLAY_VIDEO', { when: Date.now(), periodInMinutes })
       return sendResponse({ status: "OK" })
     }
   })
 }
 
 function setupAlarmListeners() {
+  logger.info(`chrome`, chrome)
   chrome.alarms.onAlarm.addListener((alarmInfo = {}) => {
     logger.info(`alarm went off ${JSON.stringify(alarmInfo)}`)
     const { name } = alarmInfo
 
     if (name === 'PLAY_VIDEO') {
-      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        logger.info(`tabs`, tabs)
-        chrome.tabs.sendMessage(tabs[0].id, { type: "PLAY_VIDEO", payload: { startTime: "01:10" } }, (response) => {
-          logger.info(`response from content to PLAY_VIDEO`, response)
-        })
+      // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      //   logger.info(`tabs`, tabs)
+      //   const tabId = tabs && tabs[0].id || videoLoopTabId
+      //   chrome.tabs.sendMessage(tabId, { type: "PLAY_VIDEO", payload: { startTime: "01:10" } }, (response) => {
+      //     logger.info(`response from content to PLAY_VIDEO`, response)
+      //   })
+      // })
+      chrome.tabs.sendMessage(lastActiveTabId, {
+        type: "PLAY_VIDEO",
+        payload: { startTime: "01:10" }
+      }, (response) => {
+        logger.info(`response from content to PLAY_VIDEO`, response)
       })
     }
   })
 }
 
 function main() {
-  enableExtension({ hostEquals: 'localhost' })
+  enableExtension({ hostEquals: 'www.youtube.com' })
   setupMessageListener(),
   setupAlarmListeners()
 }
