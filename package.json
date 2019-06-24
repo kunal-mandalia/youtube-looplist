@@ -6,8 +6,7 @@
   "author": "Kunal Mandalia <kunal.v.mandalia@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "jest": "^24.8.0",
-    "jsdom": "^15.1.1"
+    "jest": "^24.8.0"
   },
   "scripts": {
     "test": "jest",
@@ -20,8 +19,8 @@
   },
   "jest": {
     "setupFiles": [
-      "./__mocks__/dom.js",
-      "./__mocks__/chrome.js"
+      "./__mocks__/chrome.js",
+      "./__mocks__/ui.js"
     ]
   }
 }

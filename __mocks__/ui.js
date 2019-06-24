@@ -1,0 +1,3 @@
+global.document.getElementById = () => ({
+  addEventListener: () => {}
+})
