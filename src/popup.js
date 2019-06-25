@@ -46,5 +46,6 @@ function main() {
 main()
 
 export default {
-  startLoop
+  startLoop,
+  stopLoops
 }

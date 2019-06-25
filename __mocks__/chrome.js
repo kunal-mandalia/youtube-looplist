@@ -2,8 +2,8 @@ const minToMs = minutes => minutes * 1000 * 60
 
 class MockChrome {
   constructor() {
-    this.alarms = {}
-    this.messages = []
+    this._alarms = {}
+    this._messages = []
 
     this.messageListeners = []
     this.alarmListeners = []
@@ -29,16 +29,17 @@ class MockChrome {
       create: this._alarmCreate,
       onAlarm: {
         addListener: this._addAlarmListener
-      }
+      },
+      clearAll: this._clearAllAlarms
     }
   }
 
   _sendResponse = (message) => {
-    this.messages.push(message)
+    this._messages.push(message)
   }
 
   _sendMessage = (message, callback) => {
-    this.messages.push(message)
+    this._messages.push(message)
     this.messageListeners.forEach(handler => {
       handler(message, {}, callback)
     })
@@ -49,7 +50,7 @@ class MockChrome {
   }
 
   _tabSendMessage = (tab, message, callback) => {
-    this.messages.push(message)
+    this._messages.push(message)
     this.messageListeners.forEach(handler => {
       handler(message, tab, callback)
     })
@@ -57,7 +58,7 @@ class MockChrome {
 
   _alarmCreate = (name, alarmInfo = {}) => {
     const interval = setInterval(() => { this._notifyAlarmListeners({ name, ...alarmInfo }) }, minToMs(alarmInfo.periodInMinutes))
-    this.alarms[name] = {
+    this._alarms[name] = {
       interval,
       alarmInfo
     }
@@ -70,6 +71,14 @@ class MockChrome {
   _notifyAlarmListeners = (alarmInfo) => {
     this.alarmListeners.forEach(listener => {
       listener(alarmInfo)
+    })
+  }
+
+  _clearAllAlarms = () => {
+    console.log(">>> alarms", this._alarms)
+    Object.values(this._alarms).forEach(alarm => {
+      console.log('clearing', alarm)
+      clearInterval(alarm.interval)
     })
   }
 }

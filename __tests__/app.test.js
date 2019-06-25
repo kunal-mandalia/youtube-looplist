@@ -17,7 +17,8 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  mockVideo.play.mockClear()
+  mockVideo.play.mockReset()
+  popup.stopLoops()
 })
 
 describe(`app`, () => {
@@ -43,13 +44,22 @@ describe(`app`, () => {
     })
   })
 
-  describe.skip(`stop loop`, () => {
+  describe(`stop loop`, () => {
     it(`should stop playing the video`, () => {
+      const input = {
+        startTime: '1:10',
+        endTime: '2:10',
+        wait: minToMs(5)
+      }
+      const expected = {
+        loops: 0
+      }
 
-    })
+      popup.startLoop(1, input.startTime, input.endTime)
+      popup.stopLoops()
+      jest.advanceTimersByTime(input.wait)
 
-    it(`should not loop the video`, () => {
-
+      expect(mockVideo.play).toBeCalledTimes(expected.loops)      
     })
   })
 })
