@@ -11,7 +11,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' src/ dist/"
+    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' src/ dist/",
+    "dev": "serve ./__stub__/"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.4.4",

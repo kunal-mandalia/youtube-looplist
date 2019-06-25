@@ -73,7 +73,7 @@ function setupAlarmListeners() {
 }
 
 function main() {
-  enableExtension({ hostEquals: 'www.youtube.com' })
+  enableExtension({ hostEquals: 'localhost' })
   setupMessageListener(),
   setupAlarmListeners()
 }
