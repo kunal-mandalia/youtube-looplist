@@ -1,6 +1,12 @@
 import { logger } from './util/logger.js'
 
-logger.info(`popup.js invoked`)
+logger.info(`popup.js invoked`, chrome.storage.sync)
+
+const activeLoopDetails = document.getElementById('text-active-loop-details')
+const containerStartLoop = document.getElementById('container-start-loop')
+const containerStopLoop = document.getElementById('container-stop-loop')
+const buttonStopLoops = document.getElementById('button-stop-loops')
+
 
 function startLoop(tabId, startTime, endTime) {
   const message = {
@@ -13,12 +19,23 @@ function startLoop(tabId, startTime, endTime) {
   }
   chrome.runtime.sendMessage(message, response => {
     logger.info(`popup startLoop response`, response)
+
+    activeLoopDetails.innerHTML = JSON.stringify(response)
+    containerStartLoop.style.display = 'none'
+    containerStopLoop.style.display = 'block'
+    buttonStopLoops.disabled = false
+
   })
 }
 
 function stopLoops() {
   chrome.alarms.clearAll(wasCleared => {
     logger.info(`stop loops ${wasCleared ? 'cleared' : 'not cleared'}`)
+
+    activeLoopDetails.innerHTML = ''
+    containerStartLoop.style.display = 'block'
+    containerStopLoop.style.display = 'block'
+    buttonStopLoops.disabled = true
   })
 }
 
@@ -39,6 +56,12 @@ function setupHandlers() {
   })
 }
 
+function getLoopInfo(callback) {
+  chrome.storage.sync.get(undefined, result => {
+    callback(result)
+  })
+}
+
 function main() {
   setupHandlers()
 }
@@ -47,5 +70,6 @@ main()
 
 export default {
   startLoop,
-  stopLoops
+  stopLoops,
+  getLoopInfo
 }

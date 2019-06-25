@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <div>
-      <label>Start Time: </label><input id="input-start-time" value="1:10" />
+    <div id="container-start-loop">
+      <label>Start Time: </label><input id="input-start-time" value="0:3" />
       <br />
-      <label>End Time: </label><input id="input-end-time" value="1:12" />
+      <label>End Time: </label><input id="input-end-time" value="0:6" />
       <br />
       <button id="button-start-loop">Start Loop</button>
-      <hr />
-      <button id="button-stop-loops">Stop Loops</button>
+    </div>
+    
+    <div id="container-stop-loop">
+        <p id="text-active-loop-details"></p>
+        <button id="button-stop-loops" disabled>Stop Loops</button>
     </div>
     <script type="module" src="popup.js"></script>
   </body>

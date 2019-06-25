@@ -47,7 +47,11 @@ function setupMessageListener() {
       const alarmName = 'PLAY_VIDEO'
       const alarm = { when: Date.now(), periodInMinutes }
       chrome.alarms.create(alarmName, alarm)
+
+      // replace _alarms with storage
       _alarms[alarmName] = { name: alarmName, ...alarm, ...message.payload }
+
+      chrome.storage.sync.set({ [alarmName]: { name: alarmName, ...alarm, ...message.payload } })
       logger.info(`_alarms`, _alarms)
       return sendResponse({ status: "OK" })
     }

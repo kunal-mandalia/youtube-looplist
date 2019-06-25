@@ -4,6 +4,7 @@ class MockChrome {
   constructor() {
     this._alarms = {}
     this._messages = []
+    this._storage = {}
 
     this.messageListeners = []
     this.alarmListeners = []
@@ -31,6 +32,12 @@ class MockChrome {
         addListener: this._addAlarmListener
       },
       clearAll: this._clearAllAlarms
+    }
+    this.storage = {
+      sync: {
+        set: this._setStorage,
+        get: this._getStorage
+      }
     }
   }
 
@@ -75,11 +82,25 @@ class MockChrome {
   }
 
   _clearAllAlarms = () => {
-    console.log(">>> alarms", this._alarms)
     Object.values(this._alarms).forEach(alarm => {
       console.log('clearing', alarm)
       clearInterval(alarm.interval)
     })
+  }
+
+  _setStorage = (item, callback = () => {}) => {
+    this._storage = { ...this._storage, ...item }
+    callback(item)
+  }
+
+  _getStorage = ([key] = [], callback) => {
+    let result
+    if (key) {
+      result = this._storage[key]
+    } else {
+      result = this._storage
+    }
+    callback(result)
   }
 }
 

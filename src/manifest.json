@@ -16,7 +16,8 @@
   ],
   "permissions": [
     "declarativeContent",
-    "alarms"
+    "alarms",
+    "storage"
   ],
   "web_accessible_resources": [
     "popup.js",
