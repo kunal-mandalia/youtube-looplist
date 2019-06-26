@@ -87,5 +87,30 @@ describe(`app`, () => {
         expect(result).toMatchObject(expected.loopsInfo)
       })
     })
+
+    it('should clear persistent information on demand', () => {
+      const input = {
+        startTime: '1:10',
+        endTime: '2:10',
+        wait: minToMs(5)
+      }
+      const expected = {
+        loopsInfo: {
+          "PLAY_VIDEO": {
+            "endTime": "2:10",
+            "name": "PLAY_VIDEO",
+            "periodInMinutes": 1,
+            "startTime": "1:10",
+            "tabId": 1
+          },
+        }
+      }
+
+      popup.startLoop(1, input.startTime, input.endTime)
+      popup.clearLoops()
+      popup.getLoopInfo(result => {
+        expect(result).toEqual({})
+      })
+    })
   })
 })

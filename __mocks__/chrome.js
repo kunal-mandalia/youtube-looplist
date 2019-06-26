@@ -36,7 +36,8 @@ class MockChrome {
     this.storage = {
       sync: {
         set: this._setStorage,
-        get: this._getStorage
+        get: this._getStorage,
+        clear: this._clearStorage
       }
     }
   }
@@ -101,6 +102,11 @@ class MockChrome {
       result = this._storage
     }
     callback(result)
+  }
+
+  _clearStorage = (callback = () => {}) => {
+    this._storage = {}
+    callback()
   }
 }
 

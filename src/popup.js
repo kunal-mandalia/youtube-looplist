@@ -8,6 +8,19 @@ const containerStopLoop = document.getElementById('container-stop-loop')
 const buttonStopLoops = document.getElementById('button-stop-loops')
 
 
+function syncStorageToDom() {
+  getLoopInfo(loops => {
+    logger.info(`syncStorageToDom`, loops)
+    const loopNodes = document.getElementById('loop-nodes')
+
+    Object.values(loops).forEach(loop => {
+      const loopNode = document.createElement('div')
+      loopNode.innerHTML = JSON.stringify(loop)
+      loopNodes.appendChild(loopNode)
+    })
+  })
+}
+
 function startLoop(tabId, startTime, endTime) {
   const message = {
     type: 'START_LOOP',
@@ -62,8 +75,13 @@ function getLoopInfo(callback) {
   })
 }
 
+function clearLoops(callback) {
+  chrome.storage.sync.clear(callback)
+}
+
 function main() {
   setupHandlers()
+  syncStorageToDom()
 }
 
 main()
@@ -71,5 +89,6 @@ main()
 export default {
   startLoop,
   stopLoops,
-  getLoopInfo
+  getLoopInfo,
+  clearLoops
 }
