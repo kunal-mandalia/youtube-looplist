@@ -15,15 +15,16 @@ function getPeriodInMinutes(startTime, endTime) {
   return (end - start) / 60
 }
 
-function enableExtension(conditions = {}) {
+function enableExtension(conditions = { }) {
   chrome.runtime.onInstalled.addListener(() => {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
       chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {hostEquals: conditions.hostEquals},
-        })
-        ],
-            actions: [new chrome.declarativeContent.ShowPageAction()]
+        conditions: conditions.hostsEquals.map(hostEquals => {
+          return new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: {hostEquals}
+          })
+        }),
+        actions: [new chrome.declarativeContent.ShowPageAction()]
       }])
       logger.info(`added rule to whitelist host`)
     })
@@ -77,7 +78,7 @@ function setupAlarmListeners() {
 }
 
 function main() {
-  enableExtension({ hostEquals: 'localhost' })
+  enableExtension({ hostsEquals: ['localhost', 'www.youtube.com'] })
   setupMessageListener(),
   setupAlarmListeners()
 }

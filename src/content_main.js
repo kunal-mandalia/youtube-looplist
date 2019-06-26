@@ -15,11 +15,17 @@ function setupMessageListener() {
       youtubeTimeLoop.play(startTime)
       return sendResponse({ status: "OK" })
     }
+
+    if (message.type === "VIDEO_AVAILABLE") {
+      const video = document.querySelector(`video`)
+      return sendResponse({ data: !!video })
+    }
   })
 }
 
 function assignVideo () {
   const video = document.querySelector(`video`)
+  logger.info(`assignVideo`, video)
   if (video) {
     youtubeTimeLoop.setVideo(video)
   }

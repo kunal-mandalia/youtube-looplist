@@ -112,5 +112,25 @@ describe(`app`, () => {
         expect(result).toEqual({})
       })
     })
+
+    describe('getVideoAvailability', () => {
+      it('should return true when video is found', () => {
+        global.document.querySelector = jest.fn(() => { return mockVideo })
+        
+        popup.setVideoAvailability()
+        popup.getVideoAvailability(result => {
+          expect(result).toEqual(true)
+        })
+      })
+
+      it('should return false when video is not found', () => {
+        global.document.querySelector = jest.fn(() => { return undefined })
+        
+        popup.setVideoAvailability()
+        popup.getVideoAvailability(result => {
+          expect(result).toEqual(false)
+        })
+      })
+    })
   })
 })

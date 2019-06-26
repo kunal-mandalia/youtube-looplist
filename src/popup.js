@@ -79,6 +79,22 @@ function clearLoops(callback) {
   chrome.storage.sync.clear(callback)
 }
 
+function setVideoAvailability(callback = () => {}) {
+  const message = {
+    type: 'VIDEO_AVAILABLE'
+  }
+  chrome.runtime.sendMessage(message, response => {
+    logger.info(`popup getVideoAvailability response`, response)
+    chrome.storage.sync.set({ 'VIDEO_AVAILABLE': response.data }, callback)
+  })
+}
+
+function getVideoAvailability(callback = () => {}) {
+  chrome.storage.sync.get(['VIDEO_AVAILABLE'], value => {
+    callback(value)
+  })
+}
+
 function main() {
   setupHandlers()
   syncStorageToDom()
@@ -90,5 +106,7 @@ export default {
   startLoop,
   stopLoops,
   getLoopInfo,
-  clearLoops
+  clearLoops,
+  getVideoAvailability,
+  setVideoAvailability
 }
