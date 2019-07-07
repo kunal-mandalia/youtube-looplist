@@ -16,12 +16,15 @@
   ],
   "permissions": [
     "declarativeContent",
-    "alarms"
+    "alarms",
+    "storage"
   ],
   "web_accessible_resources": [
     "popup.js",
-    "util/logger.js",
+    "content_src.js",
     "content_main.js",
-    "YouTubeTimeLoop.js"
+    "util/logger.js",
+    "util/video.js",
+    "util/time.js"
   ]
 }

@@ -1,6 +1,8 @@
 const { logger } = require('./logger.js')
 
-global.console.log = jest.fn()
+global.console = {
+  log: jest.fn()
+}
 
 afterEach(() => {
   global.console.log.mockReset()
