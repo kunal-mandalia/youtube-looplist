@@ -1,4 +1,4 @@
-import time from '../src/util/time.js'
+import time from '../util/time.js'
 
 jest.useFakeTimers()
 

@@ -1,5 +1,5 @@
-import background from './background.js'
-import { logger } from './util/logger.js'
+import background from '../background/background.js'
+import { logger } from '../util/logger.js'
 
 logger.info(`popup.js invoked`, chrome.storage.sync)
 

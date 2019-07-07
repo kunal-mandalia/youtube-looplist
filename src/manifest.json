@@ -3,15 +3,15 @@
   "name": "YouTube Time Loop",
   "version": "0.2",
   "background": {
-    "page": "background.html"
+    "page": "background/background.html"
   },
   "page_action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_script.js"]
+      "js": ["content/content_script.js"]
     }
   ],
   "permissions": [
@@ -20,9 +20,9 @@
     "storage"
   ],
   "web_accessible_resources": [
-    "popup.js",
-    "content_src.js",
-    "content_main.js",
+    "popup/popup.js",
+    "content/content_src.js",
+    "content/content_main.js",
     "util/logger.js",
     "util/video.js",
     "util/time.js"

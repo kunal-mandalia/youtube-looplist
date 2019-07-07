@@ -1,35 +1,20 @@
 {
   "name": "youtube-time-loop",
   "version": "1.0.0",
+  "description": "A Chrome extension to loop a segment of a YouTube video",
   "main": "index.js",
-  "repository": "https://github.com/kunal-mandalia/youtube-time-loop",
-  "author": "Kunal Mandalia <kunal.v.mandalia@gmail.com>",
-  "license": "MIT",
-  "dependencies": {},
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' src/ dist/",
-    "dev": "serve ./__stub__/"
+    "test": "cd src/tests && yarn test",
+    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' --exclude 'node_modules' src/ dist/"
   },
-  "devDependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.5.1",
-    "@babel/plugin-transform-runtime": "^7.5.0",
-    "@babel/preset-env": "^7.5.0",
-    "@babel/runtime": "^7.5.1",
-    "babel-jest": "^24.8.0",
-    "core-js": "2",
-    "jest": "^24.8.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kunal-mandalia/youtube-time-loop.git"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
-    },
-    "setupFiles": [
-      "./__mocks__/chrome.js",
-      "./__mocks__/ui.js"
-    ]
-  }
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kunal-mandalia/youtube-time-loop/issues"
+  },
+  "homepage": "https://github.com/kunal-mandalia/youtube-time-loop#readme"
 }

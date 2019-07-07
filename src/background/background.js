@@ -1,5 +1,5 @@
-import { logger } from './util/logger.js'
-import time from './util/time.js'
+import { logger } from '../util/logger.js'
+import time from '../util/time.js'
 
 logger.info(`background.js is running`)
 
@@ -258,7 +258,7 @@ async function main() {
   setupMessageListener()
   setupAlarmListeners()
   setupTabListeners()
-  // await setInitialState()
+  await setInitialState()
 }
 
 main()

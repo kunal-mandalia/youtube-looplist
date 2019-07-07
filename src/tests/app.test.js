@@ -1,11 +1,11 @@
-import popup from '../src/popup.js'
-import content from '../src/content_main.js'
-import background from '../src/background.js'
-import video from '../src/util/video.js'
-import time from '../src/util/time.js'
+import popup from '../popup/popup.js'
+import content from '../content/content_main.js'
+import background from '../background/background.js'
+import video from '../util/video.js'
+import time from '../util/time.js'
 
 jest.useFakeTimers()
-jest.mock('../src/util/video.js')
+jest.mock('../util/video.js')
 
 beforeAll(() => {
   video.play.mockImplementation(async () => { return true })

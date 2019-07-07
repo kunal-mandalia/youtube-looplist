@@ -1,5 +1,5 @@
-import { logger } from './util/logger.js'
-import video from './util/video.js'
+import { logger } from '../util/logger.js'
+import video from '../util/video.js'
 
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
