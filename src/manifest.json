@@ -6,7 +6,7 @@
     "page": "background/background.html"
   },
   "page_action": {
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/build/index.html"
   },
   "content_scripts": [
     {
@@ -20,7 +20,11 @@
     "storage"
   ],
   "web_accessible_resources": [
-    "popup/popup.js",
+    "popup/build/index.html",
+    "popup/build/static/js/*.js",
+    "popup/build/static/css/*.css",
+    "popup/build/static/css/*.map",
+    "popup/build/static/media/*.svg",
     "content/content_src.js",
     "content/content_main.js",
     "util/logger.js",
