@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/lts-jessie-browsers
+      - image: circleci/node:lts-jessie-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
