@@ -8,6 +8,7 @@ class MockChrome {
 
     this.messageListeners = []
     this.alarmListeners = []
+    this.onRemovedTabListeners = []
     
     this.declarativeContent = {
       onPageChanged: {
@@ -19,12 +20,16 @@ class MockChrome {
       onInstalled: { addListener: jest.fn() },
       sendMessage: this._sendMessage,
       onMessage: {
-        addListener: this._addListener
+        addListener: this._addMessageListener
       }
     }
     this.tabs = {
       query: (q, cb) => { cb([{ id: 1 }]) },
-      sendMessage: this._tabSendMessage
+      sendMessage: this._tabSendMessage,
+      onRemoved: {
+        addListener: this._addTabRemoveListener
+      },
+      update: this._updateTab
     }
     this.alarms = {
       create: this._alarmCreate,
@@ -42,6 +47,23 @@ class MockChrome {
     }
   }
 
+  mockReset = () => {
+    this._clearAllAlarms()
+    this._alarms = {}
+    this._messages = []
+    this._storage = {}
+    
+    this.messageListeners = []
+    this.alarmListeners = []
+    this.onRemovedTabListeners = []
+  }
+
+  closeTab = (id) => {
+    this.onRemovedTabListeners.forEach(listener => {
+      listener(id, true)
+    })
+  }
+
   _sendResponse = (message) => {
     this._messages.push(message)
   }
@@ -53,8 +75,8 @@ class MockChrome {
     })
   }
 
-  _addListener = (fn) => {
-    this.messageListeners.push(fn)
+  _addMessageListener = (handler) => {
+    this.messageListeners.push(handler)
   }
 
   _tabSendMessage = (tab, message, callback) => {
@@ -65,7 +87,10 @@ class MockChrome {
   }
 
   _alarmCreate = (name, alarmInfo = {}) => {
-    const interval = setInterval(() => { this._notifyAlarmListeners({ name, ...alarmInfo }) }, minToMs(alarmInfo.periodInMinutes))
+    const interval = setInterval(() => {
+      this._notifyAlarmListeners({ name, ...alarmInfo })
+    }, minToMs(alarmInfo.periodInMinutes))
+
     this._alarms[name] = {
       interval,
       alarmInfo
@@ -82,11 +107,11 @@ class MockChrome {
     })
   }
 
-  _clearAllAlarms = () => {
+  _clearAllAlarms = (callback = () => {}) => {
     Object.values(this._alarms).forEach(alarm => {
-      console.log('clearing', alarm)
       clearInterval(alarm.interval)
     })
+    callback()
   }
 
   _setStorage = (item, callback = () => {}) => {
@@ -94,18 +119,35 @@ class MockChrome {
     callback(item)
   }
 
-  _getStorage = ([key] = [], callback) => {
-    let result
-    if (key) {
-      result = this._storage[key]
-    } else {
-      result = this._storage
+  _getStorage = (a, b) => {
+    if (typeof a === 'function') {
+      return a(this._storage)
     }
-    callback(result)
+
+    if (typeof b === 'function') {
+      if (Array.isArray(a)) {
+        const subObject = a.reduce((obj, key) => {
+          return {
+            ...obj,
+            [key]: this._storage[key]
+          }
+        }, {})
+        return b(subObject)
+      }
+      return b(this._storage)
+    }
   }
 
   _clearStorage = (callback = () => {}) => {
     this._storage = {}
+    callback({})
+  }
+
+  _addTabRemoveListener = (listener) => {
+    this.onRemovedTabListeners.push(listener)
+  }
+
+  _updateTab = (tabId, update, callback = () => {}) => {
     callback()
   }
 }
