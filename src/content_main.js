@@ -1,40 +1,34 @@
 import { logger } from './util/logger.js'
-import { youtubeTimeLoop } from './YouTubeTimeLoop.js'
-
+import video from './util/video.js'
 
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     logger.info(`content received message`, message, sender)
 
-    if (!message || !message.type) {
-      return logger.error(`unhandled message`, message, sender)
-    }
+    switch (message.type) {
+      case 'PLAY_VIDEO':
+        const { startSeconds } = message.payload
+        video.play(startSeconds)
+          .then(() => { sendResponse({ status: "OK" }) })
+        return true
+        break;
+
+      case 'IS_VIDEO_AVAILABLE':
+        return sendResponse({ data: !!video.isAvailable() })
+        break;
   
-    if (message.type === "PLAY_VIDEO") {
-      const { startTime } = message.payload
-      youtubeTimeLoop.play(startTime)
-      return sendResponse({ status: "OK" })
+      default:
+        logger.error(`unhandled message`, message, sender)
+        return sendResponse({ status: "UNRECOGNISED_MESSAGE" })
+        break;
     }
 
-    if (message.type === "VIDEO_AVAILABLE") {
-      const video = document.querySelector(`video`)
-      return sendResponse({ data: !!video })
-    }
+    return true
   })
-}
-
-function assignVideo () {
-  const video = document.querySelector(`video`)
-  logger.info(`assignVideo`, video)
-  if (video) {
-    youtubeTimeLoop.setVideo(video)
-  }
 }
 
 export function main () {
   logger.info(`content_main.js invoked`)
-  
-  assignVideo()
   setupMessageListener()
 }
 

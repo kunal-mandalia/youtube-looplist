@@ -1,136 +1,202 @@
 import popup from '../src/popup.js'
 import content from '../src/content_main.js'
-import background from '../src/background'
-import { youtubeTimeLoop } from '../src/YouTubeTimeLoop'
+import background from '../src/background.js'
+import video from '../src/util/video.js'
+import time from '../src/util/time.js'
 
 jest.useFakeTimers()
-
-const mockVideo = { play: jest.fn() }
-
-function minToMs(minutes) {
-  return minutes * 1000 * 60
-}
+jest.mock('../src/util/video.js')
 
 beforeAll(() => {
-  content.main()
-  youtubeTimeLoop.setVideo(mockVideo)
+  video.play.mockImplementation(async () => { return true })
+  video.isAvailable.mockImplementation(() => { return true })
 })
 
-afterEach(() => {
-  mockVideo.play.mockReset()
-  popup.stopLoops()
+beforeEach(async () => {
+  chrome.mockReset()
+  jest.clearAllTimers()
+  video.play.mockClear()
+  video.isAvailable.mockClear()
+  
+  await content.main()
+  await popup.main()
+  await background.main()
 })
 
+/**
+ * TODO: direct calls to background methods should be replaced 
+ * by calls to popup as they're closer to the user.
+ * There's an issue with timers not executing when messages passed 
+ * from popup in jest
+ */
 describe(`app`, () => {
-  describe(`start loop`, () => {
-    it(`should play video on loop from start time`, () => {
+  describe(`add video to playlist`, () => {
+    it(`should add video to playlist`, async () => {
       const input = {
-        startTime: '1:10',
-        endTime: '2:10',
-        wait: minToMs(5)
+        newVideo: {
+          id: 'VIDEO_001',
+          url: 'mocktube.com/abc',
+          start: '01:10',
+          stop: '4:44'
+        }
       }
       const expected = {
-        startTimeSeconds: 70,
-        loops: 5
+        response: {
+          status: 'OK'
+        },
+        storage: {"videos": [{"id": "VIDEO_001", "start": "01:10", "stop": "4:44", "url": "mocktube.com/abc"}]}
       }
 
-      popup.startLoop(1, input.startTime, input.endTime)
+      await popup.addVideo(input.newVideo, response => {
+        expect(response).toEqual(expected.response)
+      })
+
+      expect(chrome.storage.sync.get(storage => {
+        expect(storage).toEqual(expected.storage)
+      }))
+    })
+  })
+
+  describe(`remove video from playlist`, () => {
+    it(`should remove video from playlist`, async () => {
+      const input = {
+        newVideo: {
+          id: 'VIDEO_001',
+          url: 'mocktube.com/abc',
+          start: '01:10',
+          stop: '4:44'
+        }
+      }
+      const expected = {
+        response: {
+          status: 'OK'
+        },
+        storage: {"videos": []}
+      }
+
+      await popup.addVideo(input.newVideo)
+      expect(chrome.storage.sync.get(storage => {
+        expect(storage.videos).toHaveLength(1)
+      }))
+
+      const response = await popup.removeVideo('VIDEO_001')
+      expect(response).toEqual(expected.response)
+
+      expect(chrome.storage.sync.get(storage => {
+        expect(storage).toEqual(expected.storage)
+      }))
+    })
+  })
+
+  describe(`play video on loop`, () => {
+    it(`should play video on loop`, async () => {
+      const input = {
+        newVideo: {
+          id: 'VIDEO_001',
+          url: 'mocktube.com/abc',
+          start: '02:10',
+          stop: '4:10'
+        },
+        wait: time.convertToMilliseconds(20)
+      }
+      const expected = {
+        response: {
+          status: 'OK'
+        },
+        storage: {"videos": []},
+        loopCount: 10,
+        startTimeSeconds: 130
+      }
+
+      await popup.addVideo(input.newVideo)
+      await background.playVideo({
+        id: 'VIDEO_001',
+        loop: true,
+        tabId: 1
+      })
+      
       jest.advanceTimersByTime(input.wait)
 
-      expect(mockVideo.play).toBeCalledTimes(expected.loops)
-      mockVideo.play.mock.calls.forEach(c => {
+      expect(video.play).toBeCalledTimes(expected.loopCount)
+      video.play.mock.calls.forEach(c => {
         expect(c[0]).toEqual(expected.startTimeSeconds)
       })
     })
   })
 
-  describe(`stop loop`, () => {
-    it(`should stop playing the video`, () => {
-      const input = {
-        startTime: '1:10',
-        endTime: '2:10',
-        wait: minToMs(5)
-      }
-      const expected = {
-        loops: 0
-      }
+  describe(`play video one time`, () => {
+    it(`should play video once`, () => {
 
-      popup.startLoop(1, input.startTime, input.endTime)
-      popup.stopLoops()
-      jest.advanceTimersByTime(input.wait)
-
-      expect(mockVideo.play).toBeCalledTimes(expected.loops)
     })
   })
 
-  describe('persistence', () => {
-    it('should persist loop information', () => {
+  describe(`stop video`, () => {
+    it(`should stop playing`, async () => {
       const input = {
-        startTime: '1:10',
-        endTime: '2:10',
-        wait: minToMs(5)
+        newVideo: {
+          id: 'VIDEO_001',
+          url: 'mocktube.com/abc',
+          start: '01:00',
+          stop: '2:30'
+        },
+        firstWait: time.convertToMilliseconds(3),
+        secondWait: time.convertToMilliseconds(6)
       }
       const expected = {
-        loopsInfo: {
-          "PLAY_VIDEO": {
-            "endTime": "2:10",
-            "name": "PLAY_VIDEO",
-            "periodInMinutes": 1,
-            "startTime": "1:10",
-            "tabId": 1
-          },
-        }
+        response: {
+          status: 'OK'
+        },
+        storage: {"videos": []},
+        loopCount: 2
       }
 
-      popup.startLoop(1, input.startTime, input.endTime)
-      popup.getLoopInfo(result => {
-        expect(result).toMatchObject(expected.loopsInfo)
+      await popup.addVideo(input.newVideo)
+      await background.playVideo({
+        id: 'VIDEO_001',
+        loop: true,
+        tabId: 1
       })
-    })
 
-    it('should clear persistent information on demand', () => {
+      jest.advanceTimersByTime(input.firstWait)
+      expect(video.play).toBeCalledTimes(expected.loopCount)
+
+      await background.stopVideo()
+      
+      jest.advanceTimersByTime(input.secondWait)
+      expect(video.play).toBeCalledTimes(expected.loopCount)
+    })
+  })
+
+  describe(`close browser tab`, () => {
+    it(`should stop playing`, async () => {
       const input = {
-        startTime: '1:10',
-        endTime: '2:10',
-        wait: minToMs(5)
+        newVideo: {
+          id: 'VIDEO_001',
+          url: 'mocktube.com/abc',
+          start: '02:10',
+          stop: '4:10'
+        },
+        wait: time.convertToMilliseconds(10)
       }
       const expected = {
-        loopsInfo: {
-          "PLAY_VIDEO": {
-            "endTime": "2:10",
-            "name": "PLAY_VIDEO",
-            "periodInMinutes": 1,
-            "startTime": "1:10",
-            "tabId": 1
-          },
-        }
+        response: {
+          status: 'OK'
+        },
+        storage: {"videos": []},
+        loopCount: 0
       }
 
-      popup.startLoop(1, input.startTime, input.endTime)
-      popup.clearLoops()
-      popup.getLoopInfo(result => {
-        expect(result).toEqual({})
-      })
-    })
-
-    describe('getVideoAvailability', () => {
-      it('should return true when video is found', () => {
-        global.document.querySelector = jest.fn(() => { return mockVideo })
-        
-        popup.setVideoAvailability()
-        popup.getVideoAvailability(result => {
-          expect(result).toEqual(true)
-        })
+      await popup.addVideo(input.newVideo)
+      await background.playVideo({
+        id: 'VIDEO_001',
+        loop: true,
+        tabId: 1
       })
 
-      it('should return false when video is not found', () => {
-        global.document.querySelector = jest.fn(() => { return undefined })
-        
-        popup.setVideoAvailability()
-        popup.getVideoAvailability(result => {
-          expect(result).toEqual(false)
-        })
-      })
+      chrome.closeTab(1)
+
+      jest.advanceTimersByTime(input.wait)
+      expect(video.play).toBeCalledTimes(expected.loopCount)
     })
   })
 })
