@@ -9,7 +9,6 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' src/ dist/",
     "dev": "serve ./__stub__/"
   },
   "devDependencies": {

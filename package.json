@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "cd src/tests && yarn test",
-    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' --exclude 'node_modules' src/ dist/"
+    "build": "rm -rf dist/ && rsync -avz --exclude '*.test.js' --exclude 'node_modules' src/ dist/",
+    "dev": "serve ./src/tests/__stub__/"
   },
   "repository": {
     "type": "git",
