@@ -22,12 +22,6 @@ beforeEach(async () => {
   await background.main()
 })
 
-/**
- * TODO: direct calls to background methods should be replaced 
- * by calls to popup as they're closer to the user.
- * There's an issue with timers not executing when messages passed 
- * from popup in jest
- */
 describe(`app`, () => {
   describe(`add video to playlist`, () => {
     it(`should add video to playlist`, async () => {
@@ -114,10 +108,9 @@ describe(`app`, () => {
       }
 
       await popup.addVideo(input.newVideo)
-      await background.playVideo({
+      await popup.playVideo({
         id: 'VIDEO_001',
-        loop: true,
-        tabId: 1
+        loop: true
       })
       
       jest.advanceTimersByTime(input.wait)
@@ -156,16 +149,15 @@ describe(`app`, () => {
       }
 
       await popup.addVideo(input.newVideo)
-      await background.playVideo({
+      await popup.playVideo({
         id: 'VIDEO_001',
-        loop: true,
-        tabId: 1
+        loop: true
       })
 
       jest.advanceTimersByTime(input.firstWait)
       expect(video.play).toBeCalledTimes(expected.loopCount)
 
-      await background.stopVideo()
+      await popup.stopVideo()
       
       jest.advanceTimersByTime(input.secondWait)
       expect(video.play).toBeCalledTimes(expected.loopCount)
@@ -192,10 +184,9 @@ describe(`app`, () => {
       }
 
       await popup.addVideo(input.newVideo)
-      await background.playVideo({
+      await popup.playVideo({
         id: 'VIDEO_001',
-        loop: true,
-        tabId: 1
+        loop: true
       })
 
       chrome.closeTab(1)
