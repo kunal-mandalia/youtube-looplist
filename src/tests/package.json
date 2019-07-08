@@ -27,6 +27,10 @@
     "setupFiles": [
       "./__mocks__/chrome.js",
       "./__mocks__/ui.js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^util/(.*)$": "<rootDir>/../util/$1",
+      "^background/(.*)$": "<rootDir>/../background/$1"
+    }
   }
 }
