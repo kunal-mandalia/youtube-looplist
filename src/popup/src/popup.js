@@ -2,7 +2,7 @@ import { logger } from 'util/logger.js'
 
 async function sendMessage({ message }) {
   return new Promise((resolve, reject) => {
-    global.chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    window.chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       if (tabs && tabs[0].id) {
         const tabId = tabs[0].id
         const messageWithTabId = {
@@ -12,7 +12,7 @@ async function sendMessage({ message }) {
             tabId
           }
         }
-        global.chrome.runtime.sendMessage(messageWithTabId, response => {
+        window.chrome.runtime.sendMessage(messageWithTabId, response => {
           return resolve(response)
         })
       } else {
@@ -51,15 +51,23 @@ async function playVideo({ id, loop }) {
 }
 
 async function stopVideo() {
-  const STOP_VIDEO_MESSAGE = {
+  const STOP_VIDEO_REQUEST_MESSAGE = {
     type: 'STOP_VIDEO_REQUEST'
   }
-  return await sendMessage({ message: STOP_VIDEO_MESSAGE })
+  return await sendMessage({ message: STOP_VIDEO_REQUEST_MESSAGE })
+}
+
+async function getStorage() {
+  const GET_STORAGE_REQUEST_MESSAGE = {
+    type: 'GET_STORAGE_REQUEST'
+  }
+  return await sendMessage({ message: GET_STORAGE_REQUEST_MESSAGE })
 }
 
 export default {
   addVideo,
   removeVideo,
   playVideo,
-  stopVideo
+  stopVideo,
+  getStorage
 }

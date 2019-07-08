@@ -1,6 +1,5 @@
 import React from 'react';
 import { logger } from 'util/logger'
-import logo from './logo.svg';
 import './App.css';
 import popup from './popup.js'
 
@@ -13,8 +12,19 @@ class App extends React.Component {
   }
   componentDidMount() {
     if (window.chrome) {
-      this.setState({ isChromeAvailable: true })
+      console.log(window.chrome)
+      this.fetchStorage()
     }
+  }
+
+  fetchStorage = async () => {
+    logger.info(`fetchStorage...`)
+    const storage = await popup.getStorage()
+    logger.info(`storage`, storage)
+    this.setState({
+      isChromeAvailable: true,
+      ...storage
+    })
   }
 
   render() {
@@ -22,7 +32,6 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <p>
             Edit <code>src/App.js</code> and save to reload.
         </p>

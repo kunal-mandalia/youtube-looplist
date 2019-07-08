@@ -73,6 +73,12 @@ function setupMessageListener() {
         return true
         break;
 
+      case 'GET_STORAGE_REQUEST':
+        getStorage()
+          .then(result => { sendResponse(result) })
+        return true
+        break;
+
       default:
         break;
     }
@@ -260,6 +266,14 @@ function setupTabListeners() {
           })
         })
       }
+    })
+  })
+}
+
+async function getStorage() {
+  return new Promise(resolve => {
+    chrome.storage.sync.get(storage => {
+      resolve(storage)
     })
   })
 }
