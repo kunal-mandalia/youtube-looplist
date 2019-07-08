@@ -1,33 +1,34 @@
-import { logger } from './util/logger.js'
-import time from './util/time.js'
+import { logger } from '../util/logger.js'
+import time from '../util/time.js'
 
 logger.info(`background.js is running`)
+
+const initialState = {
+  activeVideo: null,
+  videos: [
+    {
+      id: 'VIDEO_0001',
+      url: 'https://www.youtube.com/watch?v=Hc7BjYmn9z0',
+      start: "02:24",
+      stop: "06:10"
+    }
+  ]
+}
 
 async function setInitialState() {
   return new Promise(async (resolve) => {
     await stopVideo()
-    const initialState = {
-      activeVideo: null,
-      videos: [
-        {
-          id: 'VIDEO_0001',
-          url: 'https://www.youtube.com/watch?v=Hc7BjYmn9z0',
-          start: "02:24",
-          stop: "06:10"
-        }
-      ]
-    }
     chrome.storage.sync.set(initialState, resolve)
   })
 }
 
-function enableExtension(conditions = { }) {
+function enableExtension(conditions = {}) {
   chrome.runtime.onInstalled.addListener(() => {
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
       chrome.declarativeContent.onPageChanged.addRules([{
         conditions: conditions.hostsEquals.map(hostEquals => {
           return new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: {hostEquals}
+            pageUrl: { hostEquals }
           })
         }),
         actions: [new chrome.declarativeContent.ShowPageAction()]
@@ -41,17 +42,27 @@ function enableExtension(conditions = { }) {
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     logger.info(`background.js received message`, message, sender)
-    
+
     if (!message || !message.type) {
       logger.error(`unhandled message type`, message)
     }
 
-    let result
-    
     switch (message.type) {
+      case 'ADD_VIDEO_REQUEST':
+        const { video } = message.payload
+        addVideo(video)
+          .then(result => { sendResponse(result) })
+        return true
+        break;
+
+      case 'REMOVE_VIDEO_REQUEST':
+        removeVideo(message.payload.id)
+          .then(result => { sendResponse(result) })
+        return true
+        break;
+
       case 'PLAY_VIDEO_REQUEST':
-        const { id, loop, tabId } = message.payload
-        playVideo({ id, loop, tabId })
+        playVideo({ ...message.payload })
           .then(result => { sendResponse(result) })
         return true
         break;
@@ -61,7 +72,7 @@ function setupMessageListener() {
           .then(result => { sendResponse(result) })
         return true
         break;
-    
+
       default:
         break;
     }
@@ -113,7 +124,7 @@ async function addVideo(video) {
   })
 }
 
-async function removeVideo(id, callback = () => {}) {
+async function removeVideo(id) {
   return new Promise(resolve => {
     chrome.storage.sync.get(storage => {
       const videos = (storage.videos || []).filter(video => video.id !== id)
@@ -130,7 +141,7 @@ async function removeVideo(id, callback = () => {}) {
 
 async function getVideoById(id) {
   return new Promise((resolve, reject) => {
-    chrome.storage.sync.get(['videos'], ({ videos = []}) => {
+    chrome.storage.sync.get(['videos'], ({ videos = [] }) => {
       const video = videos.find(video => video.id === id)
       logger.info(`getVideoById`, videos, video)
       if (video) {
@@ -258,7 +269,7 @@ async function main() {
   setupMessageListener()
   setupAlarmListeners()
   setupTabListeners()
-  // await setInitialState()
+  await setInitialState()
 }
 
 main()
@@ -268,5 +279,6 @@ export default {
   addVideo,
   removeVideo,
   playVideo,
-  stopVideo
+  stopVideo,
+  initialState
 }

@@ -1,5 +1,5 @@
-import { logger } from './util/logger.js'
-import video from './util/video.js'
+import { logger } from '../util/logger.js'
+import video from '../util/video.js'
 
 function setupMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -18,8 +18,7 @@ function setupMessageListener() {
         break;
   
       default:
-        logger.error(`unhandled message`, message, sender)
-        return sendResponse({ status: "UNRECOGNISED_MESSAGE" })
+        logger.error(`content did not handle message`, message, sender)
         break;
     }
 
