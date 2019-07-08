@@ -28,5 +28,11 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "jest": {
+    "moduleNameMapper": {
+      "^util/(.*)$": "<rootDir>/../util/$1",
+      "^background/(.*)$": "<rootDir>/../background/$1"
+    }
+  }
 }

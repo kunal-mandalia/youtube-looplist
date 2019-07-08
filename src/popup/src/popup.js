@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import { logger } from 'util/logger.js'
 
 async function sendMessage({ message }) {
   return new Promise((resolve, reject) => {
-    window.chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       if (tabs && tabs[0].id) {
         const tabId = tabs[0].id
         const messageWithTabId = {
@@ -12,7 +13,7 @@ async function sendMessage({ message }) {
             tabId
           }
         }
-        window.chrome.runtime.sendMessage(messageWithTabId, response => {
+        chrome.runtime.sendMessage(messageWithTabId, response => {
           return resolve(response)
         })
       } else {
