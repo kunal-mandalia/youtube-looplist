@@ -1,4 +1,4 @@
-import popup from '../popup/popup.js'
+import popup from '../popup/src/popup.js'
 import content from '../content/content_main.js'
 import background from '../background/background.js'
 import video from '../util/video.js'
@@ -19,7 +19,6 @@ beforeEach(async () => {
   video.isAvailable.mockClear()
   
   await content.main()
-  await popup.main()
   await background.main()
 })
 
@@ -44,7 +43,13 @@ describe(`app`, () => {
         response: {
           status: 'OK'
         },
-        storage: {"videos": [{"id": "VIDEO_001", "start": "01:10", "stop": "4:44", "url": "mocktube.com/abc"}]}
+        storage: {
+          "activeVideo": null,
+          "videos": [
+            ...background.initialState.videos,
+            {"id": "VIDEO_001", "start": "01:10", "stop": "4:44", "url": "mocktube.com/abc"}
+          ]
+        }
       }
 
       await popup.addVideo(input.newVideo, response => {
@@ -71,12 +76,12 @@ describe(`app`, () => {
         response: {
           status: 'OK'
         },
-        storage: {"videos": []}
+        storage: background.initialState
       }
 
       await popup.addVideo(input.newVideo)
       expect(chrome.storage.sync.get(storage => {
-        expect(storage.videos).toHaveLength(1)
+        expect(storage.videos).toHaveLength(2)
       }))
 
       const response = await popup.removeVideo('VIDEO_001')

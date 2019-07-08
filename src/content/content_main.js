@@ -18,8 +18,7 @@ function setupMessageListener() {
         break;
   
       default:
-        logger.error(`unhandled message`, message, sender)
-        return sendResponse({ status: "UNRECOGNISED_MESSAGE" })
+        logger.error(`content did not handle message`, message, sender)
         break;
     }
 
