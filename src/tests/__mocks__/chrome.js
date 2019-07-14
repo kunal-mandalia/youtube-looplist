@@ -1,4 +1,5 @@
 const minToMs = minutes => minutes * 1000 * 60
+const noop = () => {}
 
 class MockChrome {
   constructor() {
@@ -9,15 +10,31 @@ class MockChrome {
     this.messageListeners = []
     this.alarmListeners = []
     this.onRemovedTabListeners = []
+
+    this.mockReset = this.mockReset.bind(this)
+    this.closeTab = this.closeTab.bind(this)
+    this._sendResponse = this._sendResponse.bind(this)
+    this._sendMessage = this._sendMessage.bind(this)
+    this._addMessageListener = this._addMessageListener.bind(this)
+    this._tabSendMessage = this._tabSendMessage.bind(this)
+    this._alarmCreate = this._alarmCreate.bind(this)
+    this._addAlarmListener = this._addAlarmListener.bind(this)
+    this._notifyAlarmListeners = this._notifyAlarmListeners.bind(this)
+    this._clearAllAlarms = this._clearAllAlarms.bind(this)
+    this._setStorage = this._setStorage.bind(this)
+    this._getStorage = this._getStorage.bind(this)
+    this._clearStorage = this._clearStorage.bind(this)
+    this._addTabRemoveListener = this._addTabRemoveListener.bind(this)
+    this._updateTab = this._updateTab.bind(this)
     
     this.declarativeContent = {
       onPageChanged: {
-        addRules: jest.fn(),
-        removeRules: jest.fn()
+        addRules: noop,
+        removeRules: noop
       }
     }
     this.runtime = {
-      onInstalled: { addListener: jest.fn() },
+      onInstalled: { addListener: noop },
       sendMessage: this._sendMessage,
       onMessage: {
         addListener: this._addMessageListener
@@ -47,7 +64,7 @@ class MockChrome {
     }
   }
 
-  mockReset = () => {
+  mockReset() {
     this._clearAllAlarms()
     this._alarms = {}
     this._messages = []
@@ -58,35 +75,35 @@ class MockChrome {
     this.onRemovedTabListeners = []
   }
 
-  closeTab = (id) => {
+  closeTab(id) {
     this.onRemovedTabListeners.forEach(listener => {
       listener(id, true)
     })
   }
 
-  _sendResponse = (message) => {
+  _sendResponse(message) {
     this._messages.push(message)
   }
 
-  _sendMessage = (message, callback) => {
+  _sendMessage(message, callback) {
     this._messages.push(message)
     this.messageListeners.forEach(handler => {
       handler(message, {}, callback)
     })
   }
 
-  _addMessageListener = (handler) => {
+  _addMessageListener(handler) {
     this.messageListeners.push(handler)
   }
 
-  _tabSendMessage = (tab, message, callback) => {
+  _tabSendMessage(tab, message, callback) {
     this._messages.push(message)
     this.messageListeners.forEach(handler => {
       handler(message, tab, callback)
     })
   }
 
-  _alarmCreate = (name, alarmInfo = {}) => {
+  _alarmCreate(name, alarmInfo = {}) {
     const interval = setInterval(() => {
       this._notifyAlarmListeners({ name, ...alarmInfo })
     }, minToMs(alarmInfo.periodInMinutes))
@@ -97,29 +114,29 @@ class MockChrome {
     }
   }
 
-  _addAlarmListener = (callback) => {
+  _addAlarmListener(callback) {
     this.alarmListeners.push(callback)
   }
 
-  _notifyAlarmListeners = (alarmInfo) => {
+  _notifyAlarmListeners(alarmInfo) {
     this.alarmListeners.forEach(listener => {
       listener(alarmInfo)
     })
   }
 
-  _clearAllAlarms = (callback = () => {}) => {
+  _clearAllAlarms(callback = ()=> {}) {
     Object.values(this._alarms).forEach(alarm => {
       clearInterval(alarm.interval)
     })
     callback()
   }
 
-  _setStorage = (item, callback = () => {}) => {
+  _setStorage(item, callback = () => {}) {
     this._storage = { ...this._storage, ...item }
     callback(item)
   }
 
-  _getStorage = (a, b) => {
+  _getStorage(a, b) {
     if (typeof a === 'function') {
       return a(this._storage)
     }
@@ -138,20 +155,18 @@ class MockChrome {
     }
   }
 
-  _clearStorage = (callback = () => {}) => {
+  _clearStorage(callback = () => {}) {
     this._storage = {}
     callback({})
   }
 
-  _addTabRemoveListener = (listener) => {
+  _addTabRemoveListener(listener) {
     this.onRemovedTabListeners.push(listener)
   }
 
-  _updateTab = (tabId, update, callback = () => {}) => {
+  _updateTab(tabId, update, callback = () => {}) {
     callback()
   }
 }
 
-const mockChrome = new MockChrome()
-
-global.chrome = mockChrome
+export const chrome = new MockChrome()

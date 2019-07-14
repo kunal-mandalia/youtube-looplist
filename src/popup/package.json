@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/core": "7.4.3",
+    "@babel/core": "^7.5.4",
     "@svgr/webpack": "4.1.0",
     "@typescript-eslint/eslint-plugin": "1.6.0",
     "@typescript-eslint/parser": "1.6.0",
@@ -61,7 +61,8 @@
   "scripts": {
     "start": "NODE_PATH='../' node scripts/start.js",
     "build": "NODE_PATH='../' PUBLIC_URL='/popup/build/' INLINE_RUNTIME_CHUNK=false node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test:watch": "node scripts/test.js",
+    "test": "CI=true node scripts/test.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -79,7 +80,13 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/react": "^8.0.4"
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/runtime": "^7.5.4",
+    "@testing-library/react": "^8.0.4",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "corejs": "^1.0.0"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -87,7 +94,8 @@
       "!src/**/*.d.ts"
     ],
     "setupFiles": [
-      "react-app-polyfill/jsdom"
+      "react-app-polyfill/jsdom",
+      "../tests/__mocks__/chrome.js"
     ],
     "setupFilesAfterEnv": [],
     "testMatch": [
@@ -108,7 +116,10 @@
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
-      "^util/(.*)$": "<rootDir>/../util/$1"
+      "^util/(.*)$": "<rootDir>/../util/$1",
+      "^background/(.*)$": "<rootDir>/../background/$1",
+      "^content/(.*)$": "<rootDir>/../content/$1",
+      "^tests/(.*)$": "<rootDir>/../tests/$1"
     },
     "moduleFileExtensions": [
       "web.js",
