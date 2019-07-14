@@ -2,27 +2,23 @@ import { logger } from '../util/logger.js'
 import time from '../util/time.js'
 
 logger.info(`background.js is running`)
+let chrome = window.chrome
 
 const initialState = {
   activeVideo: null,
-  videos: [
-    {
-      id: 'VIDEO_0001',
-      url: 'https://www.youtube.com/watch?v=Hc7BjYmn9z0',
-      start: "02:24",
-      stop: "06:10"
-    }
-  ]
+  videos: []
 }
 
-async function setInitialState() {
+async function setInitialState({ videos }) {
   return new Promise(async (resolve) => {
     await stopVideo()
-    chrome.storage.sync.set(initialState, resolve)
+    chrome.storage.sync.set({ ...initialState, videos }, resolve)
+    logger.info(`set initial state`, initialState)
   })
 }
 
 function enableExtension(conditions = {}) {
+  logger.info(`enableExtension`, chrome)
   chrome.runtime.onInstalled.addListener(() => {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
       chrome.declarativeContent.onPageChanged.addRules([{
@@ -94,7 +90,7 @@ function setupAlarmListeners() {
     if (name === 'PLAY_VIDEO') {
       chrome.storage.sync.get(storage => {
         const { activeVideo } = storage
-        if (!activeVideo) logger.error(`Cannot play video when activeVideo is not set`)
+        if (!activeVideo) logger.error(`cannot play video when activeVideo is not set`)
 
         const { tabId, startSeconds } = activeVideo
         logger.info(`sending message to tabId ${tabId}`)
@@ -120,7 +116,10 @@ async function addVideo(video) {
         ...storage,
         videos: [
           ...videos,
-          video
+          {
+            ...video,
+            id: Date.now()
+          }
         ]
       }
       chrome.storage.sync.set(updatedStorage, () => {
@@ -167,7 +166,7 @@ async function playVideo({ id, loop, tabId }) {
   await redirectToVideo({
     tabId: video.tabId,
     url: video.url,
-    start: video.start
+    startTime: video.startTime
   })
   logger.info(`redirected to video`)
   await waitUntilVideoReady({ tabId })
@@ -179,9 +178,9 @@ async function playVideo({ id, loop, tabId }) {
   return { status: "OK" }
 }
 
-async function redirectToVideo({ tabId, url, start }) {
+async function redirectToVideo({ tabId, url, startTime }) {
   return new Promise(resolve => {
-    const urlWithStartTime = `${url}&start=${time.convertToSeconds(start)}`
+    const urlWithStartTime = `${url}&start=${time.convertToSeconds(startTime)}`
     chrome.tabs.update(tabId, { url: urlWithStartTime }, resolve)
   })
 }
@@ -215,13 +214,13 @@ async function waitUntilVideoReady({
 
 async function setActiveVideo({ video, tabId, loop }) {
   return new Promise(resolve => {
-    const { id, start, stop } = video
+    const { id, startTime, stopTime } = video
     const activeVideo = {
       id,
       loop,
       tabId,
-      startSeconds: time.convertToSeconds(start),
-      stopSeconds: time.convertToSeconds(stop),
+      startSeconds: time.convertToSeconds(startTime),
+      stopSeconds: time.convertToSeconds(stopTime),
     }
     chrome.storage.sync.set({ activeVideo }, resolve)
   })
@@ -229,8 +228,9 @@ async function setActiveVideo({ video, tabId, loop }) {
 
 async function setAlarm({ video }) {
   return new Promise(resolve => {
-    const { start, stop } = video
-    const periodInMinutes = time.getPeriodInMinutes(start, stop)
+    const { startTime, stopTime } = video
+    logger.info(`set alarm at`, startTime, stopTime)
+    const periodInMinutes = time.getPeriodInMinutes(startTime, stopTime)
     const alarm = { delayInMinutes: periodInMinutes, periodInMinutes }
     chrome.alarms.create('PLAY_VIDEO', alarm)
     return resolve()
@@ -278,15 +278,18 @@ async function getStorage() {
   })
 }
 
-async function main() {
+export async function main(options = { videos: [] }) {
+  if (options.mockChrome) {
+    chrome = options.mockChrome
+    logger.info(`background: set chrome`, options.mockChrome)
+  }
   enableExtension({ hostsEquals: ['localhost', 'www.youtube.com'] })
   setupMessageListener()
   setupAlarmListeners()
   setupTabListeners()
-  await setInitialState()
-}
 
-main()
+  await setInitialState({ videos: options.videos })
+}
 
 export default {
   main,

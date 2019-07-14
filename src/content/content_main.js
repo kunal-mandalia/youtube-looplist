@@ -26,7 +26,10 @@ function setupMessageListener() {
   })
 }
 
-export function main () {
+export function main (options = {}) {
+  if (options.mockChrome) {
+    chrome = options.mockChrome
+  }
   logger.info(`content_main.js invoked`)
   setupMessageListener()
 }

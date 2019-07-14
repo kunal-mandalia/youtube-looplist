@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
 import { logger } from 'util/logger.js'
 
+logger.info(`popup invoked`)
+
 async function sendMessage({ message }) {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
@@ -13,6 +15,7 @@ async function sendMessage({ message }) {
             tabId
           }
         }
+        logger.info(`sending message ${JSON.stringify(messageWithTabId)}`)
         chrome.runtime.sendMessage(messageWithTabId, response => {
           return resolve(response)
         })
@@ -24,6 +27,7 @@ async function sendMessage({ message }) {
 }
 
 async function addVideo (video = {}) {
+  logger.info(`popup add video`)
   const ADD_VIDEO_MESSAGE = {
     type: 'ADD_VIDEO_REQUEST',
     payload: {
@@ -65,10 +69,15 @@ async function getStorage() {
   return await sendMessage({ message: GET_STORAGE_REQUEST_MESSAGE })
 }
 
+function setChrome(mockChrome) {
+  chrome = mockChrome
+}
+
 export default {
   addVideo,
   removeVideo,
   playVideo,
   stopVideo,
-  getStorage
+  getStorage,
+  setChrome
 }
