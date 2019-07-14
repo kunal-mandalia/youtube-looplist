@@ -1,35 +1,99 @@
-.App {
+html {
+  height: 600px;
+}
+
+.app {
   width: 400px;
   height: 600px;
+  overflow: scroll;
   text-align: center;
+  background-color: #3a3a3a;
+  color: #d6d6d6;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+button {
+  background: #636363;
+  border: none;
+  border-bottom: 2px solid #3a3a3a;
+  color: #fff;
+  font-size: medium;
+  margin: 2px;
+  width: 120px;
+  padding: 8px 10px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+button:hover {
+  border-bottom: solid 2px paleturquoise;
+}
+
+input {
+  padding: 8px 10px;
+  border: none;
+  border-bottom: 2px solid #3a3a3a;
+  background: #ffffff1a;
+  color: antiquewhite;
+}
+
+input:hover {
+  border-bottom: solid 2px paleturquoise;
+}
+
+.form-add-video {
+  background-color: #434343;
+  border-left: solid 8px paleturquoise;
+  padding: 20px 15px;
+}
+
+.form-two-column {
+  display: grid;
+  grid-template-columns: 20% 75%;
+  grid-gap: 4px 5%;
+}
+
+.form-two-column > label {
+  justify-self: right;
+  align-self: center;
+}
+
+.action-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.playlist-item:nth-child(n) {
+  background-color: #3e3e3e;
+}
+
+.playlist-item:nth-child(2n) {
+  background-color: #333333;
+}
+
+.playlist-item {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-gap: 0 20px;
+  align-self: center;
+  justify-self: start;
+  border-left: solid 8px #3a3a3a;
+  padding: 4px 0 4px 15px;
+}
+
+.playlist-item-details {
+  align-self: center;
+  justify-self: start;
+}
+
+.playlist-item.active-video {
+  border-left: 8px solid paleturquoise;
+  background-color: #305454;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.playlist-item.inactive-video {
+  border-left: solid 8px #434343;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.component-add-video > .add-video-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px;
 }
