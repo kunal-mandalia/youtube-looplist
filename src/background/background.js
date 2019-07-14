@@ -2,7 +2,7 @@ import { logger } from '../util/logger.js'
 import time from '../util/time.js'
 
 logger.info(`background.js is running`)
-let chrome = window.chrome
+let chrome = window && window.chrome
 
 const initialState = {
   activeVideo: null,
