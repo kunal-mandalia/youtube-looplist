@@ -73,7 +73,7 @@ input:hover {
   grid-gap: 0 20px;
   align-self: center;
   justify-self: start;
-  border-left: solid 8px #3a3a3a;
+  border-left: solid 8px #616161;
   padding: 4px 0 4px 15px;
 }
 
@@ -89,7 +89,7 @@ input:hover {
 }
 
 .playlist-item.inactive-video {
-  border-left: solid 8px #434343;
+  border-left: solid 8px #616161;
 }
 
 .component-add-video > .add-video-button-wrapper {
