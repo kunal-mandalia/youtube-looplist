@@ -23,14 +23,17 @@
     "jest": "^24.8.0"
   },
   "jest": {
-    "testEnvironment": "node",
+    "testEnvironment": "jsdom",
     "setupFiles": [
-      "./__mocks__/chrome.js",
+      "./__mocks__/globalChrome.js",
       "./__mocks__/ui.js"
     ],
     "moduleNameMapper": {
       "^util/(.*)$": "<rootDir>/../util/$1",
       "^background/(.*)$": "<rootDir>/../background/$1"
+    },
+    "globals": {
+      "window": {}
     }
   }
 }

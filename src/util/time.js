@@ -7,9 +7,9 @@ function convertToSeconds(timeString) {
   return (parseInt(m, 10) * 60) + (parseInt(s, 10))
 }
 
-function getPeriodInMinutes(startTime, endTime) {
+function getPeriodInMinutes(startTime, stopTime) {
   const start = convertToSeconds(startTime)
-  const end = convertToSeconds(endTime)
+  const end = convertToSeconds(stopTime)
   return (end - start) / 60
 }
 

@@ -1,8 +1,9 @@
 import React from 'react';
+import './app.css';
 import { logger } from 'util/logger'
-import logo from './logo.svg';
-import './App.css';
 import popup from './popup.js'
+import { AddVideo } from './AddVideo'
+import { Playlist } from './Playlist'
 
 class App extends React.Component {
   constructor() {
@@ -11,33 +12,54 @@ class App extends React.Component {
       isChromeAvailable: false
     }
   }
+  
   componentDidMount() {
-    if (window.chrome) {
-      this.setState({ isChromeAvailable: true })
-    }
+    this.fetchStorage()
+  }
+
+  fetchStorage = async () => {
+    const storage = await popup.getStorage()
+    this.setState({
+      isChromeAvailable: true,
+      ...storage
+    })
+  }
+
+  syncState = async () => {
+    const storage = await popup.getStorage()
+    this.setState({
+      ...storage
+    })
+    logger.info('synced state', this.state)
+  }
+
+  handleAddVideo = async (video) => {
+    await popup.addVideo(video)
+    await this.syncState()
+  }
+
+  handlePlayVideo = async (id) => {
+    await popup.playVideo({ id, loop: true })
+    await this.syncState()
+  }
+
+  handleStopVideo = async () => {
+    await popup.stopVideo()
+    await this.syncState()
   }
 
   render() {
-    logger.info(`App this`, this)
+    logger.info(`App render`)
+    const { activeVideo, videos } = this.state
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-        </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-        </a>
-          <hr />
-          <button onClick={() => { popup.playVideo({ id: 'VIDEO_0001', loop: true }) }}>Play</button><br />
-          <button onClick={() => { popup.stopVideo() }}>Stop</button>
-        </header>
+      <div className="app">
+        <AddVideo onAddVideo={this.handleAddVideo}/>
+        <Playlist
+          activeVideo={activeVideo}
+          videos={videos}
+          playVideo={this.handlePlayVideo}
+          stopVideo={this.handleStopVideo}
+        />
       </div>
     );
   }

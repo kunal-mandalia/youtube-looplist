@@ -1,8 +1,11 @@
+/* eslint-disable no-undef */
 import { logger } from 'util/logger.js'
+
+logger.info(`popup invoked`)
 
 async function sendMessage({ message }) {
   return new Promise((resolve, reject) => {
-    global.chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       if (tabs && tabs[0].id) {
         const tabId = tabs[0].id
         const messageWithTabId = {
@@ -12,7 +15,8 @@ async function sendMessage({ message }) {
             tabId
           }
         }
-        global.chrome.runtime.sendMessage(messageWithTabId, response => {
+        logger.info(`sending message ${JSON.stringify(messageWithTabId)}`)
+        chrome.runtime.sendMessage(messageWithTabId, response => {
           return resolve(response)
         })
       } else {
@@ -23,6 +27,7 @@ async function sendMessage({ message }) {
 }
 
 async function addVideo (video = {}) {
+  logger.info(`popup add video`)
   const ADD_VIDEO_MESSAGE = {
     type: 'ADD_VIDEO_REQUEST',
     payload: {
@@ -51,15 +56,28 @@ async function playVideo({ id, loop }) {
 }
 
 async function stopVideo() {
-  const STOP_VIDEO_MESSAGE = {
+  const STOP_VIDEO_REQUEST_MESSAGE = {
     type: 'STOP_VIDEO_REQUEST'
   }
-  return await sendMessage({ message: STOP_VIDEO_MESSAGE })
+  return await sendMessage({ message: STOP_VIDEO_REQUEST_MESSAGE })
+}
+
+async function getStorage() {
+  const GET_STORAGE_REQUEST_MESSAGE = {
+    type: 'GET_STORAGE_REQUEST'
+  }
+  return await sendMessage({ message: GET_STORAGE_REQUEST_MESSAGE })
+}
+
+function setChrome(mockChrome) {
+  chrome = mockChrome
 }
 
 export default {
   addVideo,
   removeVideo,
   playVideo,
-  stopVideo
+  stopVideo,
+  getStorage,
+  setChrome
 }

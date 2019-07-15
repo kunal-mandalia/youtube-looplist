@@ -13,11 +13,11 @@ beforeAll(() => {
 })
 
 beforeEach(async () => {
-  chrome.mockReset()
+  global.chrome.mockReset()
   jest.clearAllTimers()
   video.play.mockClear()
   video.isAvailable.mockClear()
-  
+
   await content.main()
   await background.main()
 })
@@ -27,10 +27,10 @@ describe(`app`, () => {
     it(`should add video to playlist`, async () => {
       const input = {
         newVideo: {
-          id: 'VIDEO_001',
+          name: 'Best Day Ever',
           url: 'mocktube.com/abc',
-          start: '01:10',
-          stop: '4:44'
+          startTime: '01:10',
+          stopTime: '4:44'
         }
       }
       const expected = {
@@ -40,18 +40,16 @@ describe(`app`, () => {
         storage: {
           "activeVideo": null,
           "videos": [
-            ...background.initialState.videos,
-            {"id": "VIDEO_001", "start": "01:10", "stop": "4:44", "url": "mocktube.com/abc"}
+            { "name": "Best Day Ever", "startTime": "01:10", "stopTime": "4:44", "url": "mocktube.com/abc" }
           ]
         }
       }
 
-      await popup.addVideo(input.newVideo, response => {
-        expect(response).toEqual(expected.response)
-      })
+      const response = await popup.addVideo(input.newVideo)
+      expect(response).toEqual(expected.response)
 
       expect(chrome.storage.sync.get(storage => {
-        expect(storage).toEqual(expected.storage)
+        expect(storage).toMatchObject(expected.storage)
       }))
     })
   })
@@ -60,10 +58,10 @@ describe(`app`, () => {
     it(`should remove video from playlist`, async () => {
       const input = {
         newVideo: {
-          id: 'VIDEO_001',
+          name: 'OST',
           url: 'mocktube.com/abc',
-          start: '01:10',
-          stop: '4:44'
+          startTime: '01:10',
+          stopTime: '4:44'
         }
       }
       const expected = {
@@ -74,12 +72,15 @@ describe(`app`, () => {
       }
 
       await popup.addVideo(input.newVideo)
+      
+      let videoId
       expect(chrome.storage.sync.get(storage => {
-        expect(storage.videos).toHaveLength(2)
+        expect(storage.videos).toHaveLength(1)
+        videoId = storage.videos[0].id
       }))
 
-      const response = await popup.removeVideo('VIDEO_001')
-      expect(response).toEqual(expected.response)
+      const response = await popup.removeVideo(videoId)
+      expect(response).toMatchObject(expected.response)
 
       expect(chrome.storage.sync.get(storage => {
         expect(storage).toEqual(expected.storage)
@@ -91,10 +92,10 @@ describe(`app`, () => {
     it(`should play video on loop`, async () => {
       const input = {
         newVideo: {
-          id: 'VIDEO_001',
+          name: 'Mock You',
           url: 'mocktube.com/abc',
-          start: '02:10',
-          stop: '4:10'
+          startTime: '02:10',
+          stopTime: '4:10'
         },
         wait: time.convertToMilliseconds(20)
       }
@@ -102,17 +103,24 @@ describe(`app`, () => {
         response: {
           status: 'OK'
         },
-        storage: {"videos": []},
+        storage: { "videos": [] },
         loopCount: 10,
         startTimeSeconds: 130
       }
 
       await popup.addVideo(input.newVideo)
+
+      let videoId
+      chrome.storage.sync.get(storage => {
+        expect(storage.videos).toHaveLength(1)
+        videoId = storage.videos[0].id
+      })
+
       await popup.playVideo({
-        id: 'VIDEO_001',
+        id: videoId,
         loop: true
       })
-      
+
       jest.advanceTimersByTime(input.wait)
 
       expect(video.play).toBeCalledTimes(expected.loopCount)
@@ -122,7 +130,7 @@ describe(`app`, () => {
     })
   })
 
-  describe(`play video one time`, () => {
+  describe.skip(`play video one time`, () => {
     it(`should play video once`, () => {
 
     })
@@ -132,10 +140,10 @@ describe(`app`, () => {
     it(`should stop playing`, async () => {
       const input = {
         newVideo: {
-          id: 'VIDEO_001',
+          name: 'Stopper',
           url: 'mocktube.com/abc',
-          start: '01:00',
-          stop: '2:30'
+          startTime: '01:00',
+          stopTime: '2:30'
         },
         firstWait: time.convertToMilliseconds(3),
         secondWait: time.convertToMilliseconds(6)
@@ -144,13 +152,20 @@ describe(`app`, () => {
         response: {
           status: 'OK'
         },
-        storage: {"videos": []},
+        storage: { "videos": [] },
         loopCount: 2
       }
 
       await popup.addVideo(input.newVideo)
+
+      let videoId
+      chrome.storage.sync.get(storage => {
+        expect(storage.videos).toHaveLength(1)
+        videoId = storage.videos[0].id
+      })
+
       await popup.playVideo({
-        id: 'VIDEO_001',
+        id: videoId,
         loop: true
       })
 
@@ -158,7 +173,7 @@ describe(`app`, () => {
       expect(video.play).toBeCalledTimes(expected.loopCount)
 
       await popup.stopVideo()
-      
+
       jest.advanceTimersByTime(input.secondWait)
       expect(video.play).toBeCalledTimes(expected.loopCount)
     })
@@ -168,10 +183,10 @@ describe(`app`, () => {
     it(`should stop playing`, async () => {
       const input = {
         newVideo: {
-          id: 'VIDEO_001',
+          name: 'Tabber',
           url: 'mocktube.com/abc',
-          start: '02:10',
-          stop: '4:10'
+          startTime: '02:10',
+          stopTime: '4:10'
         },
         wait: time.convertToMilliseconds(10)
       }
@@ -179,13 +194,20 @@ describe(`app`, () => {
         response: {
           status: 'OK'
         },
-        storage: {"videos": []},
+        storage: { "videos": [] },
         loopCount: 0
       }
 
       await popup.addVideo(input.newVideo)
+
+      let videoId
+      chrome.storage.sync.get(storage => {
+        expect(storage.videos).toHaveLength(1)
+        videoId = storage.videos[0].id
+      })
+
       await popup.playVideo({
-        id: 'VIDEO_001',
+        id: videoId,
         loop: true
       })
 
