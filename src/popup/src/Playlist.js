@@ -25,7 +25,7 @@ export function Playlist(
   }
 ) {
   return (
-    <div className='playlist'>
+    <div data-testid='playlist' className='playlist'>
       {videos.map(video => <PlaylistItem
         key={video.id}
         video={video}
