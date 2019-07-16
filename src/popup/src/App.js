@@ -48,6 +48,11 @@ class App extends React.Component {
     await this.syncState()
   }
 
+  handleRemoveVideo = async (id) => {
+    await popup.removeVideo(id)
+    await this.syncState()
+  }
+
   render() {
     logger.info(`App render`)
     const { activeVideo, videos } = this.state
@@ -59,6 +64,7 @@ class App extends React.Component {
           videos={videos}
           playVideo={this.handlePlayVideo}
           stopVideo={this.handleStopVideo}
+          removeVideo={this.handleRemoveVideo}
         />
       </div>
     );

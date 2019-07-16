@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitForElement, cleanup, getByTestId } from '@testing-library/react';
+import { render, fireEvent, waitForElement, wait, cleanup } from '@testing-library/react';
 import App from './App';
 import content from 'content/content_main.js'
 import background from 'background/background.js'
@@ -101,4 +101,36 @@ it('should play / stop a video', async () => {
   fireEvent.click(stopButton)
 
   await waitForElement(() => getByText('Play'))
+})
+
+it('should remove video', async () => {
+  const input = {
+    video: {
+      name: 'Best Day Ever',
+      url: 'https://www.youtube.com/watch?v=AbV-Q6tz4B8',
+      startTime: '01:10',
+      stopTime: '03:45'
+    }
+  }
+  const {
+    getByText,
+    getByLabelText,
+    queryAllByTestId,
+    getByTestId,
+    queryByText
+  } = render(<App />)
+
+  await addVideo(input.video, { getByText, getByLabelText })
+  expect(queryAllByTestId('playlist-item')).toHaveLength(1)
+
+  const optionsToggle = getByTestId('playlist-item-options-toggle')
+  fireEvent.click(optionsToggle)
+
+  await waitForElement(() => getByText('Remove'))
+  const removeVideoButton = getByText('Remove')
+  fireEvent.click(removeVideoButton)
+
+  await wait(() => expect(queryByText('Remove')).toEqual(null))
+
+  expect(queryAllByTestId('playlist-item')).toHaveLength(0)
 })
