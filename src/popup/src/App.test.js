@@ -23,9 +23,6 @@ beforeEach(async () => {
   
   await content.main({ mockChrome: chrome })
   await background.main({ mockChrome: chrome })
-})
-
-afterEach(() => {
   cleanup()
 })
 
