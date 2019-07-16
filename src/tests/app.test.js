@@ -130,12 +130,6 @@ describe(`app`, () => {
     })
   })
 
-  describe.skip(`play video one time`, () => {
-    it(`should play video once`, () => {
-
-    })
-  })
-
   describe(`stop video`, () => {
     it(`should stop playing`, async () => {
       const input = {
