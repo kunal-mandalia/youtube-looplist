@@ -67,3 +67,10 @@ jobs:
 
       # run tests!
       - run: cd src/tests && yarn test
+
+workflows:
+  version: 2
+  test_app_ui:
+    jobs:
+      - test-app
+      - test-ui
