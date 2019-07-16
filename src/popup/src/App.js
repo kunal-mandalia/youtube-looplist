@@ -6,8 +6,8 @@ import { AddVideo } from './AddVideo'
 import { Playlist } from './Playlist'
 
 class App extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       isChromeAvailable: false
     }
