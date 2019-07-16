@@ -1,6 +1,6 @@
 import React from 'react'
 import { PlaylistItemOptions } from './PlaylistItemOptions'
-import './app.css'
+import './styles.css'
 
 export function PlaylistItem({
   video: { id, name },

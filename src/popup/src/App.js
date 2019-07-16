@@ -1,5 +1,5 @@
 import React from 'react';
-import './app.css';
+import './styles.css';
 import { logger } from 'util/logger'
 import popup from './popup.js'
 import { AddVideo } from './AddVideo'

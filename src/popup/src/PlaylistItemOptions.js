@@ -1,5 +1,5 @@
 import React from 'react'
-import './app.css'
+import './styles.css'
 
 export class PlaylistItemOptions extends React.Component {
   constructor(props) {

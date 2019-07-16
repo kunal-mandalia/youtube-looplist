@@ -1,6 +1,6 @@
 import React from 'react'
 import { PlaylistItem } from './PlaylistItem'
-import './app.css'
+import './styles.css'
 
 export function Playlist(
   {
