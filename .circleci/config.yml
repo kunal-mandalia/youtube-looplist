@@ -66,7 +66,7 @@ jobs:
           key: v1-ui-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: cd src/tests && yarn test
+      - run: cd src/popup && yarn test
 
 workflows:
   version: 2
