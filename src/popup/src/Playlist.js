@@ -2,15 +2,13 @@ import React from 'react'
 import { PlaylistItem } from './PlaylistItem'
 import './styles.css'
 
-export function Playlist(
-  {
-    activeVideo = {},
-    videos = [],
-    playVideo = () => {},
-    stopVideo = () => {},
-    removeVideo = () => {}
-  }
-) {
+export function Playlist({
+  activeVideo = {},
+  videos = [],
+  playVideo = () => {},
+  stopVideo = () => {},
+  removeVideo = () => {}
+}) {
   return (
     <div data-testid='playlist' className='playlist'>
       {videos.map(video => <PlaylistItem

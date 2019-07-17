@@ -65,13 +65,45 @@ class AddVideo extends React.Component {
 
         <div className='form-two-column'>
           <label htmlFor='form-name'>Name</label>
-          <input id='form-name' name='name' type='text' placeholder='Name of video' value={name} onChange={this.handleFormFieldChange} />
+          <input
+            id='form-name'
+            aria-required='true'
+            name='name'
+            type='text'
+            placeholder='Name of video'
+            value={name}
+            onChange={this.handleFormFieldChange}
+          />
           <label htmlFor='form-url'>URL</label>
-          <input id='form-url' name='url' type='text' placeholder='Link to YouTube Video' value={url} onChange={this.handleFormFieldChange} />
+          <input
+            id='form-url'
+            aria-required='true'
+            name='url'
+            type='text'
+            placeholder='Link to YouTube Video'
+            value={url}
+            onChange={this.handleFormFieldChange}
+          />
           <label htmlFor='form-startTime'>Start time</label>
-          <input id='form-startTime' name='startTime' type='text' placeholder='(MM:SS) format' value={startTime} onChange={this.handleFormFieldChange} />
+          <input
+            id='form-startTime'
+            aria-required='true'
+            name='startTime'
+            type='text'
+            placeholder='(MM:SS) format'
+            value={startTime}
+            onChange={this.handleFormFieldChange}
+          />
           <label htmlFor='form-stopTime'>End time</label>
-          <input id='form-stopTime' name='stopTime' type='text' placeholder='(MM:SS) format' value={stopTime} onChange={this.handleFormFieldChange} />
+          <input
+            id='form-stopTime'
+            aria-required='true'
+            name='stopTime'
+            type='text'
+            placeholder='(MM:SS) format'
+            value={stopTime}
+            onChange={this.handleFormFieldChange}
+          />
           <div />
           <div className='action-buttons'>
             <button onClick={this.handleSubmitForm}>Save Video</button>
