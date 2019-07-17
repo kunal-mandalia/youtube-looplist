@@ -22,11 +22,13 @@ function enableExtension(conditions = {}) {
   chrome.runtime.onInstalled.addListener(() => {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
       chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: conditions.hostsEquals.map(hostEquals => {
-          return new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { hostEquals }
+        conditions: [
+          new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: {
+              hostContains: ''
+            }
           })
-        }),
+        ],
         actions: [new chrome.declarativeContent.ShowPageAction()]
       }])
       logger.info(`added rule to whitelist host`)
@@ -289,7 +291,7 @@ export async function main(options = { videos: [] }) {
     chrome = options.mockChrome
     logger.info(`background: set chrome`, options.mockChrome)
   }
-  enableExtension({ hostsEquals: ['localhost', 'www.youtube.com'] })
+  enableExtension({ })
   setupMessageListener()
   setupAlarmListeners()
   setupTabListeners()
