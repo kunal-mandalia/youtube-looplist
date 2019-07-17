@@ -20,6 +20,8 @@ button {
   margin: 2px;
   width: 120px;
   padding: 8px 10px;
+  flex-basis: 120px;
+  flex-shrink: 0;
 }
 
 button:hover {
@@ -59,6 +61,12 @@ input:hover {
   display: flex;
 }
 
+.playlist-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+}
+
 .playlist-item:nth-child(n) {
   background-color: #3e3e3e;
 }
@@ -67,19 +75,11 @@ input:hover {
   background-color: #333333;
 }
 
-.playlist-item {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  grid-gap: 0 20px;
-  align-self: center;
-  justify-self: start;
-  border-left: solid 8px #616161;
-  padding: 4px 0 4px 15px;
-}
 
 .playlist-item-details {
   align-self: center;
   justify-self: start;
+  padding: 0 10px;
 }
 
 .playlist-item.active-video {
@@ -96,4 +96,29 @@ input:hover {
   display: flex;
   justify-content: flex-end;
   padding: 20px;
+}
+
+.playlist-item-options {
+  display: flex;
+  justify-items: flex-end;
+}
+
+
+.playlist-item-options > .toggle {
+  margin-left: 8px;
+  border-radius: 8px;
+  width: 12px;
+  height: 100%;
+}
+
+.playlist-item-options > .collapsed {
+  background-color: grey;
+}
+
+.playlist-item-options > .expanded {
+  background-color: white !important;
+}
+
+.playlist-item-options > .toggle:hover {
+  background-color:#a9a9a9;
 }
