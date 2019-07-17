@@ -4,6 +4,11 @@ async function play (start) {
   await video.play()
 }
 
+async function stop () {
+  const video = document.querySelector('video')
+  await video.pause()
+}
+
 function isAvailable () {
   const video = document.querySelector(`video`)
   return !!video
@@ -11,5 +16,6 @@ function isAvailable () {
 
 export default {
   play,
+  stop,
   isAvailable
 }

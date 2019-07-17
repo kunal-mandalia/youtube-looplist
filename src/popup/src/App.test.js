@@ -11,6 +11,7 @@ jest.mock('util/video.js')
 
 beforeAll(() => {
   video.play.mockImplementation(async () => { return true })
+  video.stop.mockImplementation(async () => { return true })
   video.isAvailable.mockImplementation(() => { return true })
   global.chrome = chrome
 })

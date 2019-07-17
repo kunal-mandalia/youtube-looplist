@@ -49,6 +49,10 @@ class App extends React.Component {
   }
 
   handleRemoveVideo = async (id) => {
+    const { activeVideo } = this.state
+    if (activeVideo && activeVideo.id === id) {
+      await popup.stopVideo()
+    }
     await popup.removeVideo(id)
     await this.syncState()
   }
