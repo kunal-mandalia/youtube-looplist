@@ -42,4 +42,4 @@ class Logger {
   }
 }
 
-export const logger = new Logger({ logLevel: ERROR })
+export const logger = new Logger({ logLevel: SILENT })

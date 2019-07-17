@@ -1,13 +1,13 @@
 import React from 'react';
-import './app.css';
+import './styles.css';
 import { logger } from 'util/logger'
 import popup from './popup.js'
 import { AddVideo } from './AddVideo'
 import { Playlist } from './Playlist'
 
 class App extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       isChromeAvailable: false
     }
@@ -48,6 +48,15 @@ class App extends React.Component {
     await this.syncState()
   }
 
+  handleRemoveVideo = async (id) => {
+    const { activeVideo } = this.state
+    if (activeVideo && activeVideo.id === id) {
+      await popup.stopVideo()
+    }
+    await popup.removeVideo(id)
+    await this.syncState()
+  }
+
   render() {
     logger.info(`App render`)
     const { activeVideo, videos } = this.state
@@ -59,6 +68,7 @@ class App extends React.Component {
           videos={videos}
           playVideo={this.handlePlayVideo}
           stopVideo={this.handleStopVideo}
+          removeVideo={this.handleRemoveVideo}
         />
       </div>
     );

@@ -9,6 +9,7 @@ jest.mock('../util/video.js')
 
 beforeAll(() => {
   video.play.mockImplementation(async () => { return true })
+  video.stop.mockImplementation(async () => { return true })
   video.isAvailable.mockImplementation(() => { return true })
 })
 
@@ -16,6 +17,7 @@ beforeEach(async () => {
   global.chrome.mockReset()
   jest.clearAllTimers()
   video.play.mockClear()
+  video.stop.mockClear()
   video.isAvailable.mockClear()
 
   await content.main()
@@ -127,12 +129,6 @@ describe(`app`, () => {
       video.play.mock.calls.forEach(c => {
         expect(c[0]).toEqual(expected.startTimeSeconds)
       })
-    })
-  })
-
-  describe.skip(`play video one time`, () => {
-    it(`should play video once`, () => {
-
     })
   })
 

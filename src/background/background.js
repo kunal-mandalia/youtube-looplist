@@ -11,7 +11,7 @@ const initialState = {
 
 async function setInitialState({ videos }) {
   return new Promise(async (resolve) => {
-    await stopVideo()
+    await stopVideo({})
     chrome.storage.sync.set({ ...initialState, videos }, resolve)
     logger.info(`set initial state`, initialState)
   })
@@ -64,7 +64,7 @@ function setupMessageListener() {
         break;
 
       case 'STOP_VIDEO_REQUEST':
-        stopVideo()
+        stopVideo({ tabId: message.payload.tabId })
           .then(result => { sendResponse(result) })
         return true
         break;
@@ -161,7 +161,7 @@ async function playVideo({ id, loop, tabId }) {
   logger.info(`background.js playVideo`, id, loop, tabId)
   const video = await getVideoById(id)
   logger.info(`video`, video)
-  await stopVideo()
+  await stopVideo({ tabId })
   logger.info(`stopped existing video`)
   await redirectToVideo({
     tabId: video.tabId,
@@ -237,7 +237,7 @@ async function setAlarm({ video }) {
   })
 }
 
-async function stopVideo() {
+async function stopVideo({ tabId } = {}) {
   logger.info(`stopVideo...`)
   return new Promise(resolve => {
     logger.info(`clearing alarms...`)
@@ -245,6 +245,12 @@ async function stopVideo() {
       logger.info(`cleared all alarms`)
       chrome.storage.sync.set({ activeVideo: null }, () => {
         logger.info(`reset active video`)
+        if (tabId) {
+          chrome.tabs.sendMessage(tabId, { type: 'STOP_VIDEO' }, (response = {}) => {
+            logger.info(`stop video response`, response)
+            return resolve(response)
+          })
+        }
         return resolve()
       })
     })

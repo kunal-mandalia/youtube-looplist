@@ -1,6 +1,6 @@
 import React from 'react'
 import { logger } from 'util/logger';
-import './app.css'
+import './styles.css'
 
 const stubs = {
   local: {
