@@ -66,8 +66,14 @@ function setupMessageListener() {
         break;
 
       case 'STOP_VIDEO_REQUEST':
-        stopVideo({ tabId: message.payload.tabId })
-          .then(result => { sendResponse(result) })
+        chrome.storage.sync.get(({ activeVideo }) => {
+          if (!activeVideo) {
+            logger.error(`Stop video requested but active video`)
+            sendResponse({ status: 'ERROR' })
+          }
+          stopVideo({ tabId: activeVideo.tabId })
+            .then(result => { sendResponse(result) })
+        })
         return true
         break;
 
