@@ -60,8 +60,16 @@ function setupMessageListener() {
         break;
 
       case 'PLAY_VIDEO_REQUEST':
-        playVideo({ ...message.payload })
-          .then(result => { sendResponse(result) })
+        chrome.storage.sync.get(({ activeVideo }) => {
+          if (activeVideo) {
+            stopVideo({ tabId: activeVideo.tabId })
+              .then(() => playVideo({ ...message.payload }))
+              .then(result => { sendResponse(result) })
+          } else {
+            playVideo({ ...message.payload })
+              .then(result => { sendResponse(result) })
+          }
+        })
         return true
         break;
 
