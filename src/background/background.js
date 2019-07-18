@@ -6,6 +6,7 @@ let chrome = window.chrome
 
 const initialState = {
   activeVideo: null,
+  tabId: null,
   videos: []
 }
 
@@ -66,8 +67,14 @@ function setupMessageListener() {
         break;
 
       case 'STOP_VIDEO_REQUEST':
-        stopVideo({ tabId: message.payload.tabId })
-          .then(result => { sendResponse(result) })
+        chrome.storage.sync.get(({ tabId, activeVideo }) => {
+          if (!activeVideo) {
+            logger.error(`Stop video requested but active video`)
+            sendResponse({ status: 'ERROR' })
+          }
+          stopVideo({ tabId })
+            .then(result => { sendResponse(result) })
+        })
         return true
         break;
 
@@ -91,13 +98,13 @@ function setupAlarmListeners() {
 
     if (name === 'PLAY_VIDEO') {
       chrome.storage.sync.get(storage => {
-        const { activeVideo } = storage
+        const { tabId, activeVideo } = storage
         if (!activeVideo) logger.error(`cannot play video when activeVideo is not set`)
 
-        const { tabId, startSeconds } = activeVideo
+        const { startSeconds } = activeVideo
         logger.info(`sending message to tabId ${tabId}`)
         chrome.tabs.sendMessage(tabId, {
-          type: "PLAY_VIDEO",
+          type: 'PLAY_VIDEO',
           payload: { startSeconds }
         }, (response) => {
           logger.info(`response to play video`, response)
@@ -159,14 +166,22 @@ async function getVideoById(id) {
   })
 }
 
-async function playVideo({ id, loop, tabId }) {
-  logger.info(`background.js playVideo`, id, loop, tabId)
+async function getTabId() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['tabId'], ({ tabId }) => resolve(tabId))
+  })
+}
+
+async function playVideo({ id, loop, tabId: newTabId }) {
+  logger.info(`background.js playVideo`, id, loop, newTabId)
+  const tabId = await getTabId() || newTabId
+  logger.info(`tabId`, tabId)
   const video = await getVideoById(id)
   logger.info(`video`, video)
   await stopVideo({ tabId })
   logger.info(`stopped existing video`)
   await redirectToVideo({
-    tabId: video.tabId,
+    tabId,
     url: video.url,
     startTime: video.startTime
   })
@@ -203,7 +218,7 @@ async function waitUntilVideoReady({
       }
       chrome.tabs.sendMessage(tabId, { type: "IS_VIDEO_AVAILABLE" }, (response = {}) => {
         logger.info(`is video available response`, response)
-        if (response.data === true) {
+        if (!chrome.runtime.lastError && response.data === true) {
           waiting = false
           return resolve(response)
         }
@@ -220,11 +235,10 @@ async function setActiveVideo({ video, tabId, loop }) {
     const activeVideo = {
       id,
       loop,
-      tabId,
       startSeconds: time.convertToSeconds(startTime),
       stopSeconds: time.convertToSeconds(stopTime),
     }
-    chrome.storage.sync.set({ activeVideo }, resolve)
+    chrome.storage.sync.set({ tabId, activeVideo }, resolve)
   })
 }
 
@@ -250,6 +264,9 @@ async function stopVideo({ tabId } = {}) {
         if (tabId) {
           chrome.tabs.sendMessage(tabId, { type: 'STOP_VIDEO' }, (response = {}) => {
             logger.info(`stop video response`, response)
+            if (chrome.runtime.lastError) {
+              logger.error(`runtime error: ${chrome.runtime.lastError.message}`)
+            }
             return resolve(response)
           })
         }
@@ -262,9 +279,10 @@ async function stopVideo({ tabId } = {}) {
 function setupTabListeners() {
   chrome.tabs.onRemoved.addListener((tabId, removed) => {
     chrome.storage.sync.get(storage => {
-      if (storage.activeVideo && storage.activeVideo.tabId === tabId) {
+      if (storage.tabId === tabId) {
         const updatedStorage = {
           ...storage,
+          tabId: null,
           activeVideo: null
         }
         chrome.alarms.clearAll(() => {
