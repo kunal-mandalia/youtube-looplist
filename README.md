@@ -3,7 +3,7 @@ A Chrome extension to loop a segment of a YouTube video
 
 ## Demo
 
-![App demo](/docs/app-demo-v1.gif)
+![App demo](/docs/app-demo.gif)
 
 ## Get started
 
