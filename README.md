@@ -3,7 +3,7 @@ A Chrome extension to loop a segment of a YouTube video
 
 ## Demo
 
-<video style="width:70%" controls src="./docs/app-demo-v1.mov"></video>
+<video style="width:70%" controls src="https://github.com/kunal-mandalia/youtube-time-loop/blob/master/docs/app-demo-v1.mov"></video>
 
 ## Get started
 
