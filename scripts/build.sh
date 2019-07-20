@@ -2,10 +2,11 @@
 
 # build
 cd src/popup && yarn build && cd ../..
-rm -rf dist/ 
+rm -rf dist/
 
 # copy to dist
 mkdir -p dist/popup/build/
+rm -rf dist/popup/build/manifest.json
 cp -r src/popup/build/ dist/popup/build/
 cp -r src/background/ dist/background/
 cp -r src/content/ dist/content/
