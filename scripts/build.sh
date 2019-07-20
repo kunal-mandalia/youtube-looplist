@@ -11,3 +11,8 @@ cp -r src/background/ dist/background/
 cp -r src/content/ dist/content/
 cp -r src/util/ dist/util/
 cp src/manifest.json dist/manifest.json
+
+# create artifact
+cd dist/
+VERSION="$(git rev-parse HEAD | head -c 7)"
+zip -r youtube-looplist.${VERSION}.zip ./*
