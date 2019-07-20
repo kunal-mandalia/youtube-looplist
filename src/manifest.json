@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "YouTube Time Loop",
+  "name": "YouTube LoopList",
   "version": "0.2",
   "background": {
     "page": "background/background.html"
