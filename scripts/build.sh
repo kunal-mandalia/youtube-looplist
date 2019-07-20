@@ -11,6 +11,7 @@ rm dist/popup/build/manifest.json
 cp -r src/background/ dist/background/
 cp -r src/content/ dist/content/
 cp -r src/util/ dist/util/
+cp -r src/assets/ dist/assets/
 cp src/manifest.json dist/manifest.json
 
 # create artifact

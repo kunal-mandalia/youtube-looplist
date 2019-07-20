@@ -2,6 +2,11 @@
   "manifest_version": 2,
   "name": "YouTube LoopList",
   "version": "0.2",
+  "icons": {
+    "16": "./assets/LoopList-16x16.png",
+    "48": "./assets/LoopList-48x48.png",
+    "128": "./assets/LoopList-128x128.png"
+  },
   "background": {
     "page": "background/background.html"
   },
