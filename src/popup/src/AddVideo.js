@@ -26,6 +26,7 @@ class AddVideo extends React.Component {
         ...stubs.local
       }
     }
+    this.form = React.createRef();
   }
 
   startAddingVideo = () => {
@@ -48,8 +49,12 @@ class AddVideo extends React.Component {
   handleSubmitForm = async (event) => {
     event.preventDefault()
     const { form: video } = this.state
-    await this.props.onAddVideo(video)
-    this.stopAddingVideo()
+    const isValidated = this.form.current.checkValidity()
+    this.form.current.reportValidity()
+    if (isValidated) {
+      await this.props.onAddVideo(video)
+      this.stopAddingVideo()
+    }
   }
 
   renderAddVideoButton = () => {
@@ -63,10 +68,11 @@ class AddVideo extends React.Component {
     return (
       <div className='form-add-video'>
 
-        <div className='form-two-column'>
+        <form ref={this.form} className='form-two-column' onSubmit={this.handleSubmitForm}>
           <label htmlFor='form-name'>Name</label>
           <input
             id='form-name'
+            required
             aria-required='true'
             name='name'
             type='text'
@@ -77,9 +83,10 @@ class AddVideo extends React.Component {
           <label htmlFor='form-url'>URL</label>
           <input
             id='form-url'
+            required
             aria-required='true'
             name='url'
-            type='text'
+            type='URL'
             placeholder='Link to YouTube Video'
             value={url}
             onChange={this.handleFormFieldChange}
@@ -87,6 +94,8 @@ class AddVideo extends React.Component {
           <label htmlFor='form-startTime'>Start time</label>
           <input
             id='form-startTime'
+            required
+            pattern='([0-5]?\d):([0-5]?\d)'
             aria-required='true'
             name='startTime'
             type='text'
@@ -97,6 +106,8 @@ class AddVideo extends React.Component {
           <label htmlFor='form-stopTime'>End time</label>
           <input
             id='form-stopTime'
+            required
+            pattern='([0-5]?\d):([0-5]?\d)'
             aria-required='true'
             name='stopTime'
             type='text'
@@ -106,10 +117,10 @@ class AddVideo extends React.Component {
           />
           <div />
           <div className='action-buttons'>
-            <button onClick={this.handleSubmitForm}>Save Video</button>
+            <button type='submit'>Save Video</button>
             <button onClick={this.stopAddingVideo}>Cancel</button>
           </div>
-        </div>
+        </form>
       </div>
     )
   }
