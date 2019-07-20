@@ -4,7 +4,7 @@
   "description": "A Chrome extension to loop a segment of a YouTube video",
   "main": "index.js",
   "scripts": {
-    "install": "cd src/tests && yarn install && ../popup && yarn install",
+    "install": "cd src/tests && yarn install && cd ../popup && yarn install",
     "test-core": "cd src/tests && yarn test",
     "test-ui": "cd src/popup && yarn test",
     "test-core:watch": "yarn test-core --watch",
