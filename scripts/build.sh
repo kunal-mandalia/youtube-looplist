@@ -6,8 +6,8 @@ rm -rf dist/
 
 # copy to dist
 mkdir -p dist/popup/build/
-rm -rf dist/popup/build/manifest.json
 cp -r src/popup/build/ dist/popup/build/
+rm dist/popup/build/manifest.json
 cp -r src/background/ dist/background/
 cp -r src/content/ dist/content/
 cp -r src/util/ dist/util/
