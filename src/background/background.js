@@ -13,13 +13,23 @@ const initialState = {
 async function setInitialState({ videos }) {
   return new Promise(async (resolve) => {
     await stopVideo({})
-    chrome.storage.sync.set({ ...initialState, videos }, resolve)
-    logger.info(`set initial state`, initialState)
+    chrome.storage.sync.get(storage => {
+      if (storage.initialised) {
+        logger.error(`initial state already set, skipping`, initialState)
+        return resolve(storage)
+      }
+      logger.info(`set initial state`, initialState)
+      chrome.storage.sync.set({
+        ...initialState,
+        videos,
+        initialised: Date.now()
+      }, resolve)
+    })
   })
 }
 
 function enableExtension(conditions = {}) {
-  logger.info(`enableExtension`, chrome)
+  logger.info(`enableExtension`)
   chrome.runtime.onInstalled.addListener(() => {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
       chrome.declarativeContent.onPageChanged.addRules([{

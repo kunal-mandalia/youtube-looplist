@@ -41,11 +41,16 @@ describe(`app`, () => {
         },
         storage: {
           "activeVideo": null,
+          "tabId": null,
           "videos": [
             { "name": "Best Day Ever", "startTime": "01:10", "stopTime": "4:44", "url": "mocktube.com/abc" }
           ]
         }
       }
+
+      chrome.storage.sync.get(storage => {
+        expect(storage).toMatchObject(background.initialState)
+      })
 
       const response = await popup.addVideo(input.newVideo)
       expect(response).toEqual(expected.response)
@@ -74,7 +79,7 @@ describe(`app`, () => {
       }
 
       await popup.addVideo(input.newVideo)
-      
+
       let videoId
       expect(chrome.storage.sync.get(storage => {
         expect(storage.videos).toHaveLength(1)
@@ -85,7 +90,7 @@ describe(`app`, () => {
       expect(response).toMatchObject(expected.response)
 
       expect(chrome.storage.sync.get(storage => {
-        expect(storage).toEqual(expected.storage)
+        expect(storage).toMatchObject(expected.storage)
       }))
     })
   })
