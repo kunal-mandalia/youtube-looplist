@@ -1,8 +1,8 @@
 {
-  "name": "youtube-time-loop-tests",
+  "name": "youtube-looplist-tests",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/kunal-mandalia/youtube-time-loop",
+  "repository": "https://github.com/kunal-mandalia/youtube-looplist",
   "author": "Kunal Mandalia <kunal.v.mandalia@gmail.com>",
   "license": "MIT",
   "dependencies": {},

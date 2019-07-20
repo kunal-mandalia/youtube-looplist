@@ -1,5 +1,5 @@
 {
-  "name": "youtube-time-loop",
+  "name": "youtube-looplist",
   "version": "1.0.0",
   "description": "A Chrome extension to loop a segment of a YouTube video",
   "main": "index.js",
@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kunal-mandalia/youtube-time-loop.git"
+    "url": "git+https://github.com/kunal-mandalia/youtube-looplist.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kunal-mandalia/youtube-time-loop/issues"
+    "url": "https://github.com/kunal-mandalia/youtube-looplist/issues"
   },
-  "homepage": "https://github.com/kunal-mandalia/youtube-time-loop#readme"
+  "homepage": "https://github.com/kunal-mandalia/youtube-looplist#readme"
 }

@@ -1,5 +1,5 @@
-# youtube-time-loop [![CircleCI](https://circleci.com/gh/kunal-mandalia/youtube-time-loop.svg?style=svg)](https://circleci.com/gh/kunal-mandalia/youtube-time-loop)
-A Chrome extension to loop a segment of a YouTube video
+# youtube-looplist [![CircleCI](https://circleci.com/gh/kunal-mandalia/youtube-looplist.svg?style=svg)](https://circleci.com/gh/kunal-mandalia/youtube-looplist)
+A Chrome extension to easily play your favourite YouTube videos on loop from any tab
 
 ## Demo
 
