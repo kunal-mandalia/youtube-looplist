@@ -27,7 +27,7 @@ beforeEach(async () => {
   cleanup()
 })
 
-async function addVideo(video, { getByText, getByLabelText }) {
+async function addVideo(video, { getByText, getByLabelText }, options = { shouldSucceed: true }) {
   const addVideoButton = getByText('Add Video')
   fireEvent.click(addVideoButton)
 
@@ -39,10 +39,13 @@ async function addVideo(video, { getByText, getByLabelText }) {
 
   fireEvent.change(nameInput,  { target: { value: video.name } })
   fireEvent.change(URLInput, { target: { value: video.url } })
-  fireEvent.change(startInput, { target: { value: video.start } })
-  fireEvent.change(stopInput, { target: { value: video.stop } })
+  fireEvent.change(startInput, { target: { value: video.startTime } })
+  fireEvent.change(stopInput, { target: { value: video.stopTime } })
   fireEvent.click(saveVideoButton)
-  await waitForElement(() => getByText('Add Video'))
+
+  if (options.shouldSucceed) {
+    await waitForElement(() => getByText('Add Video'))
+  }
 }
 
 it('should render no saved videos initially', async () => {
@@ -70,6 +73,25 @@ it('should add a new video', async () => {
   await addVideo(input.video, { getByText, getByLabelText })
   expect(queryAllByTestId('playlist-item')).toHaveLength(1)
   getByText('Best Day Ever')
+})
+
+it('should error if validation fails when adding new video', async () => {
+  const input = {
+    video: {
+      name: 'Best Day Ever',
+      url: 'https://www.youtube.com/watch?v=AbV-Q6tz4B8',
+      startTime: '',
+      stopTime: '3min'
+    }
+  }
+  const {
+    getByText,
+    getByLabelText,
+    queryAllByTestId
+  } = render(<App />)
+
+  await addVideo(input.video, { getByText, getByLabelText }, { shouldSucceed: false })
+  expect(queryAllByTestId('playlist-item')).toHaveLength(0)
 })
 
 it('should play / stop a video', async () => {

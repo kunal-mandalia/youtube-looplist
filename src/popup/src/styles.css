@@ -36,6 +36,10 @@ input {
   color: antiquewhite;
 }
 
+input:invalid {
+  border: solid 2px rgb(194, 58, 81);
+}
+
 input:hover {
   border-bottom: solid 2px paleturquoise;
 }
