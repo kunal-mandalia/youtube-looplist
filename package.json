@@ -10,7 +10,7 @@
     "test-core:watch": "yarn test-core --watch",
     "test-ui:watch": "yarn test-ui --watch",
     "test-all": "yarn test-core && yarn test-ui",
-    "build": "cd src/popup && yarn build && cd ../.. && rm -rf dist/ && rsync -avz --exclude '*.test.js' --exclude 'node_modules' --exclude 'src' src/ dist/",
+    "build": "./scripts/build.sh",
     "dev": "serve ./src/tests/__stub__/"
   },
   "repository": {
