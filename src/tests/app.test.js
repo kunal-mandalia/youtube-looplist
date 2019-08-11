@@ -14,18 +14,18 @@ beforeAll(() => {
 })
 
 beforeEach(async () => {
-  global.chrome.mockReset()
+  chrome.mockReset()
   jest.clearAllTimers()
   video.play.mockClear()
   video.stop.mockClear()
   video.isAvailable.mockClear()
 
   await content.main()
-  await background.main()
+  await background.main({ mockChrome: chrome, videos: [] })
 })
 
 describe(`app`, () => {
-  describe(`add video to playlist`, () => {
+  describe.only(`add video to playlist`, () => {
     it(`should add video to playlist`, async () => {
       const input = {
         newVideo: {

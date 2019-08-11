@@ -4,6 +4,7 @@ import { logger } from 'util/logger'
 import popup from './popup.js'
 import { AddVideo } from './AddVideo'
 import { Playlist } from './Playlist'
+import { Error } from './Error'
 
 class App extends React.Component {
   constructor(props) {
@@ -30,7 +31,6 @@ class App extends React.Component {
     this.setState({
       ...storage
     })
-    logger.info('synced state', this.state)
   }
 
   handleAddVideo = async (video) => {
@@ -57,12 +57,18 @@ class App extends React.Component {
     await this.syncState()
   }
 
+  handleRemoveError = async (id) => {
+    await popup.removeError(id)
+    await this.syncState()
+  }
+
   render() {
     logger.info(`App render`)
-    const { activeVideo, videos } = this.state
+    const { activeVideo, videos, errors } = this.state
     return (
       <div className="app">
-        <AddVideo onAddVideo={this.handleAddVideo}/>
+        <Error errors={errors} removeError={this.handleRemoveError} />
+        <AddVideo onAddVideo={this.handleAddVideo} />
         <Playlist
           activeVideo={activeVideo}
           videos={videos}
