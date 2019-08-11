@@ -163,7 +163,7 @@ it('should remove video', async () => {
   expect(queryAllByTestId('playlist-item')).toHaveLength(0)
 })
 
-it.only('handle errors', async () => {
+it('handle errors', async () => {
   const input = {
     video: {
       name: 'Best Day Ever',
@@ -187,8 +187,6 @@ it.only('handle errors', async () => {
 
   const playButton = await getByText('Play')
   fireEvent.click(playButton)
-
-  await wait()
 
   await waitForElement(() => getByText(errorDescription))
   const closeErrorButton = getByTestId('error-message-close')

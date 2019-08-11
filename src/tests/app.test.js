@@ -25,7 +25,7 @@ beforeEach(async () => {
 })
 
 describe(`app`, () => {
-  describe.only(`add video to playlist`, () => {
+  describe(`add video to playlist`, () => {
     it(`should add video to playlist`, async () => {
       const input = {
         newVideo: {
