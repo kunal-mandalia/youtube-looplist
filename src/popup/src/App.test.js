@@ -23,7 +23,7 @@ beforeEach(async () => {
   video.isAvailable.mockClear()
   
   await content.main({ mockChrome: chrome })
-  await background.main({ mockChrome: chrome })
+  await background.main({ mockChrome: chrome, videos: [] })
   cleanup()
 })
 
@@ -46,6 +46,14 @@ async function addVideo(video, { getByText, getByLabelText }, options = { should
   if (options.shouldSucceed) {
     await waitForElement(() => getByText('Add Video'))
   }
+}
+
+async function setStorage(partialUpdate = {}) {
+  return new Promise((resolve) => {
+    global.chrome.storage.sync.set(partialUpdate, () => {
+      return resolve(partialUpdate)
+    })
+  })
 }
 
 it('should render no saved videos initially', async () => {
@@ -153,4 +161,36 @@ it('should remove video', async () => {
   await wait(() => expect(queryByText('Remove')).toEqual(null))
 
   expect(queryAllByTestId('playlist-item')).toHaveLength(0)
+})
+
+it('handle errors', async () => {
+  const input = {
+    video: {
+      name: 'Best Day Ever',
+      url: 'https://www.youtube.com/watch?v=AbV-Q6tz4B8',
+      startTime: '01:10',
+      stopTime: '03:45'
+    },
+  }
+  const errorDescription = 'Error playing video. Try again.'
+  const {
+    getByText,
+    getByLabelText,
+    queryAllByTestId,
+    getByTestId,
+    queryByTestId
+  } = render(<App />)
+  await setStorage({ tabId: 404 })
+  
+  await addVideo(input.video, { getByText, getByLabelText, getByTestId })
+  expect(queryAllByTestId('playlist-item')).toHaveLength(1)
+
+  const playButton = await getByText('Play')
+  fireEvent.click(playButton)
+
+  await waitForElement(() => getByText(errorDescription))
+  const closeErrorButton = getByTestId('error-message-close')
+  fireEvent.click(closeErrorButton)
+
+  await wait(() => expect(queryByTestId('error-message-close')).toBeNull())
 })

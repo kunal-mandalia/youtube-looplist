@@ -52,7 +52,7 @@ async function playVideo({ id, loop }) {
     type: 'PLAY_VIDEO_REQUEST',
     payload: { id, loop }
   }
-  return await sendMessage({ message: PLAY_VIDEO_REQUEST_MESSAGE })
+  await sendMessage({ message: PLAY_VIDEO_REQUEST_MESSAGE })
 }
 
 async function stopVideo() {
@@ -60,6 +60,16 @@ async function stopVideo() {
     type: 'STOP_VIDEO_REQUEST'
   }
   return await sendMessage({ message: STOP_VIDEO_REQUEST_MESSAGE })
+}
+
+async function removeError(id) {
+  const REMOVE_ERROR_REQUEST_MESSAGE = {
+    type: 'REMOVE_ERROR_REQUEST',
+    payload: {
+      id
+    }
+  }
+  return await sendMessage({ message: REMOVE_ERROR_REQUEST_MESSAGE })
 }
 
 async function getStorage() {
@@ -78,6 +88,7 @@ export default {
   removeVideo,
   playVideo,
   stopVideo,
+  removeError,
   getStorage,
   setChrome
 }

@@ -7,7 +7,8 @@ let chrome = window.chrome
 const initialState = {
   activeVideo: null,
   tabId: null,
-  videos: []
+  videos: [],
+  errors: []
 }
 
 async function setInitialState({ videos }) {
@@ -18,7 +19,7 @@ async function setInitialState({ videos }) {
         logger.error(`initial state already set, skipping`, initialState)
         return resolve(storage)
       }
-      logger.info(`set initial state`, initialState)
+      logger.info(`set initial state`, initialState, videos)
       chrome.storage.sync.set({
         ...initialState,
         videos,
@@ -62,19 +63,16 @@ function setupMessageListener() {
         addVideo(video)
           .then(result => { sendResponse(result) })
         return true
-        break;
 
       case 'REMOVE_VIDEO_REQUEST':
         removeVideo(message.payload.id)
           .then(result => { sendResponse(result) })
         return true
-        break;
 
       case 'PLAY_VIDEO_REQUEST':
         playVideo({ ...message.payload })
           .then(result => { sendResponse(result) })
         return true
-        break;
 
       case 'STOP_VIDEO_REQUEST':
         chrome.storage.sync.get(({ tabId, activeVideo }) => {
@@ -86,13 +84,18 @@ function setupMessageListener() {
             .then(result => { sendResponse(result) })
         })
         return true
-        break;
+
+      case 'REMOVE_ERROR_REQUEST':
+        const { id } = message.payload
+        removeError(id)
+          .then(result => { sendResponse(result) })
+          .catch(result => { sendResponse(result) })
+        return true
 
       case 'GET_STORAGE_REQUEST':
         getStorage()
           .then(result => { sendResponse(result) })
         return true
-        break;
 
       default:
         break;
@@ -130,18 +133,8 @@ async function addVideo(video) {
   return new Promise(resolve => {
     chrome.storage.sync.get(storage => {
       logger.info(`existing storage`, storage)
-      const videos = storage.videos || []
-      const updatedStorage = {
-        ...storage,
-        videos: [
-          ...videos,
-          {
-            ...video,
-            id: Date.now()
-          }
-        ]
-      }
-      chrome.storage.sync.set(updatedStorage, () => {
+      const videos = [...storage.videos, { ...video, id: Date.now() }]
+      chrome.storage.sync.set({ videos }, () => {
         return resolve({ status: "OK" })
       })
     })
@@ -151,12 +144,8 @@ async function addVideo(video) {
 async function removeVideo(id) {
   return new Promise(resolve => {
     chrome.storage.sync.get(storage => {
-      const videos = (storage.videos || []).filter(video => video.id !== id)
-      const updatedStorage = {
-        ...storage,
-        videos
-      }
-      chrome.storage.sync.set(updatedStorage, () => {
+      const videos = [...storage.videos].filter(video => video.id !== id)
+      chrome.storage.sync.set({ videos }, () => {
         return resolve({ status: "OK" })
       })
     })
@@ -178,7 +167,42 @@ async function getVideoById(id) {
 
 async function getTabId() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(['tabId'], ({ tabId }) => resolve(tabId))
+    chrome.storage.sync.get(['tabId'], ({ tabId }) => {
+      return resolve(tabId)
+    })
+  })
+}
+
+async function verifyTabExists(tabId) {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.get(tabId, () => {
+      if (chrome.runtime.lastError) {
+        logger.error(`verify tab exists failed for ${tabId}`, chrome.runtime.lastError.message);
+        // clear tabId and activeVideo from storage if tab no longer exists
+        const partialUpdate = { activeVideo: null, tabId: null }
+        chrome.storage.sync.set(partialUpdate, () => {
+          const lastErrorStorage = chrome.runtime.lastError
+          if (chrome.runtime.lastError) return reject(Error(`could not set partial state`))
+          return reject(Error(`verify tab exists failed for ${tabId}. Reset activeVideo, tabId`))
+        })
+      } else {
+        return resolve(tabId)
+      }
+    })
+  })
+}
+
+async function removeError(id) {
+  return new Promise(resolve => {
+    chrome.storage.sync.get(storage => {
+      const partialUpdate = storage.errors.filter(e => {
+        if (e.id === id) return false
+        return true
+      })
+      chrome.storage.sync.set({ errors: partialUpdate }, () => {
+        return resolve(`removed error by id ${id}`)
+      })
+    })
   })
 }
 
@@ -186,6 +210,12 @@ async function playVideo({ id, loop, tabId: newTabId }) {
   logger.info(`background.js playVideo`, id, loop, newTabId)
   const tabId = await getTabId() || newTabId
   logger.info(`tabId`, tabId)
+  try {
+    await verifyTabExists(tabId)
+  } catch (e) {
+    await appendError({ id: Date.now(), description: `Error playing video. Try again.`})
+    return { status: "ERROR" }
+  }
   const video = await getVideoById(id)
   logger.info(`video`, video)
   await stopVideo({ tabId })
@@ -286,6 +316,16 @@ async function stopVideo({ tabId } = {}) {
   })
 }
 
+async function appendError(error) {
+  logger.info(`appending error`, error)
+  return new Promise(resolve => {
+    chrome.storage.sync.get(storage => {
+      const errors = [...storage.errors, error]
+      chrome.storage.sync.set({ errors }, resolve)
+    })
+  })
+}
+
 function setupTabListeners() {
   chrome.tabs.onRemoved.addListener((tabId, removed) => {
     chrome.storage.sync.get(storage => {
@@ -309,7 +349,7 @@ function setupTabListeners() {
 async function getStorage() {
   return new Promise(resolve => {
     chrome.storage.sync.get(storage => {
-      resolve(storage)
+      return resolve(storage)
     })
   })
 }
@@ -319,7 +359,7 @@ export async function main(options = { videos: [] }) {
     chrome = options.mockChrome
     logger.info(`background: set chrome`, options.mockChrome)
   }
-  enableExtension({ })
+  enableExtension({})
   setupMessageListener()
   setupAlarmListeners()
   setupTabListeners()

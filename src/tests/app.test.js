@@ -14,14 +14,14 @@ beforeAll(() => {
 })
 
 beforeEach(async () => {
-  global.chrome.mockReset()
+  chrome.mockReset()
   jest.clearAllTimers()
   video.play.mockClear()
   video.stop.mockClear()
   video.isAvailable.mockClear()
 
   await content.main()
-  await background.main()
+  await background.main({ mockChrome: chrome, videos: [] })
 })
 
 describe(`app`, () => {

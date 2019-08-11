@@ -126,3 +126,15 @@ input:hover {
 .playlist-item-options > .toggle:hover {
   background-color:#a9a9a9;
 }
+
+.error-message {
+  background: #e01010;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 20px;
+  align-items: center;
+}
+
+.error-message-close {
+  float: right;
+}
