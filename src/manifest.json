@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "YouTube LoopList",
-  "version": "0.2",
+  "version": "0.3",
   "icons": {
     "16": "./assets/LoopList-16x16.png",
     "48": "./assets/LoopList-48x48.png",
